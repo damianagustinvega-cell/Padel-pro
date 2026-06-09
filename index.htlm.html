@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)file:///C:/Users/damia/Downloads/padel-clases_5.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PádelPro — Gestión de Clases</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00e676;
+    --green-dark: #00b248;
+    --bg: #0a0f0a;
+    --surface: #111711;
+    --surface2: #1a221a;
+    --surface3: #222e22;
+    --text: #e8f5e8;
+    --muted: #6b8f6b;
+    --accent: #00e676;
+    --danger: #ff5252;
+    --warn: #ffab40;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── LOGIN ── */
+  #login-screen {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 30% 60%, #003d1a44 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, #00e67611 0%, transparent 50%),
+                var(--bg);
+  }
+  .login-card {
+    background: var(--surface); border: 1px solid #1e2e1e;
+    border-radius: 20px; padding: 48px 40px; width: 360px;
+    box-shadow: 0 40px 80px #00000088;
+  }
+  .login-logo { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; color: var(--green); letter-spacing: 2px; margin-bottom: 4px; }
+  .login-sub { color: var(--muted); font-size: .85rem; margin-bottom: 32px; }
+  .role-tabs { display: flex; gap: 8px; margin-bottom: 28px; }
+  .role-tab {
+    flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #1e2e1e;
+    background: var(--surface2); color: var(--muted); cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 500;
+    transition: all .2s;
+  }
+  .role-tab.active { background: var(--green); color: #000; border-color: var(--green); }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: .8rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+  .field input {
+    width: 100%; padding: 12px 14px; background: var(--surface2);
+    border: 1px solid #1e2e1e; border-radius: 8px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: .95rem;
+    transition: border-color .2s;
+  }
+  .field input:focus { outline: none; border-color: var(--green); }
+  .btn-primary {
+    width: 100%; padding: 13px; background: var(--green); color: #000;
+    border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .2s;
+  }
+  .btn-primary:hover { background: var(--green-dark); }
+  .login-hint { text-align: center; margin-top: 16px; font-size: .8rem; color: var(--muted); }
+
+  /* ── SHELL ── */
+  #app { display: none; min-height: 100vh; }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 28px; background: var(--surface);
+    border-bottom: 1px solid #1a271a; position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--green); letter-spacing: 2px; }
+  .topbar-user { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--green);
+    color: #000; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    font-size: .85rem;
+  }
+  .btn-logout {
+    padding: 7px 14px; background: transparent; border: 1px solid #1e2e1e;
+    color: var(--muted); border-radius: 7px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: .82rem; transition: all .2s;
+  }
+  .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
+  .btn-backup {
+    padding: 7px 14px; background: transparent; border: 1px solid #1e2e1e;
+    color: var(--muted); border-radius: 7px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: .82rem; transition: all .2s;
+  }
+  .btn-backup:hover { border-color: var(--green); color: var(--green); }
+  /* modal backup */
+  .backup-overlay {
+    display: none; position: fixed; inset: 0; background: #000000bb;
+    z-index: 999; align-items: center; justify-content: center;
+  }
+  .backup-overlay.open { display: flex; }
+  .backup-modal {
+    background: var(--surface); border: 1px solid #1e2e1e; border-radius: 16px;
+    padding: 32px; width: 340px; max-width: 92vw;
+  }
+  .backup-modal h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--green); margin-bottom: 6px; }
+  .backup-modal p { font-size: .85rem; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+  .backup-actions { display: flex; flex-direction: column; gap: 10px; }
+  .btn-export {
+    padding: 12px; background: var(--green); color: #000; border: none;
+    border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: .95rem;
+    font-weight: 600; cursor: pointer; transition: background .2s;
+  }
+  .btn-export:hover { background: var(--green-dark); }
+  .btn-import {
+    padding: 12px; background: var(--surface2); color: var(--text); border: 1px solid #1e2e1e;
+    border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: .95rem;
+    font-weight: 500; cursor: pointer; transition: all .2s;
+  }
+  .btn-import:hover { border-color: var(--green); color: var(--green); }
+  .btn-close-backup {
+    padding: 10px; background: transparent; color: var(--muted); border: none;
+    font-family: 'DM Sans', sans-serif; font-size: .85rem; cursor: pointer;
+    text-align: center; width: 100%;
+  }
+  .btn-close-backup:hover { color: var(--text); }
+
+  /* ── NAV TABS ── */
+  .nav-tabs {
+    display: flex; gap: 4px; padding: 16px 28px 0;
+    border-bottom: 1px solid #1a271a; background: var(--surface);
+  }
+  .nav-tab {
+    padding: 10px 18px; border-radius: 8px 8px 0 0; cursor: pointer;
+    font-size: .88rem; font-weight: 500; color: var(--muted);
+    border: 1px solid transparent; border-bottom: none;
+    transition: all .2s; font-family: 'DM Sans', sans-serif;
+  }
+  .nav-tab.active { background: var(--bg); color: var(--green); border-color: #1a271a; }
+  .nav-tab:hover:not(.active) { color: var(--text); }
+
+  /* ── MAIN ── */
+  .main { padding: 28px; max-width: 1100px; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── CARDS & GRIDS ── */
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--green); letter-spacing: 1px; margin-bottom: 20px; }
+  .card {
+    background: var(--surface); border: 1px solid #1a271a;
+    border-radius: var(--radius); padding: 20px;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .stat-card { background: var(--surface); border: 1px solid #1a271a; border-radius: var(--radius); padding: 20px; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; color: var(--green); }
+  .stat-label { color: var(--muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .5px; }
+
+  /* ── ALUMNOS ── */
+  .alumno-card {
+    background: var(--surface); border: 1px solid #1a271a;
+    border-radius: var(--radius); padding: 18px; cursor: pointer;
+    transition: border-color .2s, transform .15s;
+  }
+  .alumno-card:hover { border-color: var(--green); transform: translateY(-2px); }
+  .alumno-name { font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
+  .alumno-level { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600; margin-bottom: 8px; }
+  .level-principiante { background: #1a2e1a; color: #66bb6a; }
+  .level-intermedio { background: #2a2a0a; color: var(--warn); }
+  .level-avanzado { background: #2a1a0a; color: #ff7043; }
+  .alumno-meta { color: var(--muted); font-size: .82rem; }
+  .btn-sm {
+    padding: 7px 14px; border-radius: 7px; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600;
+    transition: all .15s;
+  }
+  .btn-green { background: var(--green); color: #000; }
+  .btn-green:hover { background: var(--green-dark); }
+  .btn-outline { background: transparent; border: 1px solid #1e2e1e; color: var(--muted); }
+  .btn-outline:hover { border-color: var(--green); color: var(--green); }
+  .btn-danger { background: transparent; border: 1px solid #331010; color: var(--danger); }
+  .btn-danger:hover { background: #ff525222; }
+  .btn-informe { background: transparent; border: 1px solid #1e3a2e; color: var(--green); }
+  .btn-informe:hover { background: #0d2e1a; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: #000000cc;
+    z-index: 200; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid #1e2e1e;
+    border-radius: 16px; padding: 28px; width: 520px; max-width: 95vw;
+    max-height: 85vh; overflow-y: auto;
+  }
+  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; color: var(--green); margin-bottom: 20px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* ── FORMS ── */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: .78rem; color: var(--muted); margin-bottom: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: .4px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 10px 12px; background: var(--surface2);
+    border: 1px solid #1e2e1e; border-radius: 8px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: .9rem;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--green); }
+  .form-group select option { background: var(--surface2); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  /* ── CLASE DETALLE ── */
+  .clase-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; border-radius: 10px; background: var(--surface2);
+    margin-bottom: 8px; border: 1px solid #1a271a; cursor: pointer;
+    transition: border-color .2s;
+  }
+  .clase-row:hover { border-color: var(--green); }
+  .clase-fecha { font-size: .82rem; color: var(--muted); }
+  .clase-title { font-weight: 600; font-size: .95rem; }
+  .chip {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: .72rem; font-weight: 600;
+  }
+  .chip-done { background: #0d2e1a; color: var(--green); }
+  .chip-pending { background: #2a2a0a; color: var(--warn); }
+
+  /* ── CALENDARIO ── */
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .cal-header { text-align: center; font-size: .72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; padding: 6px 0; }
+  .cal-day {
+    aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; font-size: .85rem;
+    background: var(--surface2); border: 1px solid transparent; cursor: pointer;
+    transition: all .15s; position: relative;
+  }
+  .cal-day:hover { border-color: var(--green); }
+  .cal-day.has-class { border-color: var(--green); background: #0d2e1a; color: var(--green); font-weight: 600; }
+  .cal-day.today { border-color: var(--warn); color: var(--warn); }
+  .cal-day.empty { background: transparent; cursor: default; }
+  .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); margin-top: 2px; }
+  .cal-nav { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .cal-nav button {
+    background: var(--surface2); border: 1px solid #1e2e1e; color: var(--text);
+    width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 1rem;
+  }
+  .cal-nav span { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; color: var(--green); letter-spacing: 1px; }
+
+  /* ── GOLPES / NIVEL ── */
+  .golpe-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: var(--surface2); border-radius: 8px; margin-bottom: 6px;
+  }
+  .golpe-name { font-size: .9rem; font-weight: 500; }
+  .golpe-stars { color: var(--green); font-size: 1rem; }
+  .stars-select { display: flex; gap: 4px; cursor: pointer; }
+  .star { color: #1e2e1e; font-size: 1.1rem; transition: color .1s; }
+  .star.on { color: var(--green); }
+
+  /* ── CORRECCIONES ── */
+  .correccion-item {
+    padding: 12px 14px; background: var(--surface2); border-radius: 8px;
+    border-left: 3px solid var(--warn); margin-bottom: 8px;
+  }
+  .correccion-text { font-size: .9rem; margin-bottom: 4px; }
+  .correccion-meta { font-size: .75rem; color: var(--muted); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .main { padding: 16px; }
+    .topbar, .nav-tabs { padding: 14px 16px 0; }
+    .nav-tab { padding: 8px 12px; font-size: .8rem; }
+  }
+
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
+  .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+  hr { border: none; border-top: 1px solid #1a271a; margin: 20px 0; }
+  .flex-between { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tag { padding: 3px 10px; border-radius: 20px; font-size: .75rem; background: #1a271a; color: var(--muted); }
+
+  /* ── ACCIONES CLASE ── */
+  .clase-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  .clase-row .clase-actions { opacity: 0; transition: opacity .2s; }
+  .clase-row:hover .clase-actions { opacity: 1; }
+
+  /* ── GRÁFICA DE PROGRESO ── */
+  .progress-chart-wrap { position: relative; width: 100%; }
+  .chart-canvas-wrap { overflow-x: auto; padding-bottom: 8px; }
+  canvas.chart { display: block; }
+  .chart-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .chart-empty { text-align: center; padding: 32px; color: var(--muted); font-size: .9rem; }
+
+  /* ── TABS DENTRO DE PERFIL ALUMNO ── */
+  .inner-tabs { display: flex; gap: 6px; margin-bottom: 20px; }
+  .inner-tab {
+    padding: 7px 16px; border-radius: 20px; cursor: pointer; font-size: .83rem;
+    font-weight: 500; color: var(--muted); background: var(--surface2);
+    border: 1px solid #1e2e1e; transition: all .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .inner-tab.active { background: var(--green); color: #000; border-color: var(--green); }
+  .inner-panel { display: none; }
+  .inner-panel.active { display: block; }
+
+  /* ── SELECTOR DE GOLPES (chips tileables) ── */
+  .golpes-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .golpe-chip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 20px; cursor: pointer;
+    border: 1px solid #1e2e1e; background: var(--surface2);
+    color: var(--muted); font-size: .82rem; font-weight: 500;
+    transition: all .15s; user-select: none;
+  }
+  .golpe-chip input[type=checkbox] { display: none; }
+  .golpe-chip.checked {
+    background: #0d2e1a; border-color: var(--green); color: var(--green);
+  }
+  .golpe-chip .chip-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    border: 1.5px solid currentColor; flex-shrink: 0; transition: background .15s;
+  }
+  .golpe-chip.checked .chip-dot { background: var(--green); border-color: var(--green); }
+  .chart-alumno-sel { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .chart-alumno-sel label { color: var(--muted); font-size: .82rem; font-weight: 500; text-transform: uppercase; letter-spacing: .4px; }
+  .chart-alumno-sel select {
+    padding: 7px 12px; background: var(--surface2); border: 1px solid #1e2e1e;
+    border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .88rem;
+  }
+
+  /* ── BIBLIOTECA DE EJERCICIOS ── */
+  .ejercicio-card {
+    background: var(--surface2); border: 1px solid #1a271a; border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 8px; transition: border-color .2s;
+  }
+  .ejercicio-card:hover { border-color: var(--green); }
+  .ejercicio-golpe-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: .72rem;
+    font-weight: 600; background: #0d2e1a; color: var(--green); margin-bottom: 6px;
+  }
+  .ejercicio-nombre { font-weight: 600; font-size: .95rem; margin-bottom: 4px; }
+  .ejercicio-desc { font-size: .83rem; color: var(--muted); line-height: 1.5; }
+  .bib-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; align-items: center; }
+  .bib-filter select, .bib-filter input {
+    padding: 8px 12px; background: var(--surface2); border: 1px solid #1e2e1e;
+    border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .85rem;
+  }
+  .bib-filter input { flex: 1; min-width: 140px; }
+
+  /* ── FILTROS CLASES ── */
+  .clases-filtros {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center;
+  }
+  .clases-filtros select, .clases-filtros input {
+    padding: 8px 12px; background: var(--surface2); border: 1px solid #1e2e1e;
+    border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .85rem;
+    transition: border-color .2s;
+  }
+  .clases-filtros select:focus, .clases-filtros input:focus { outline: none; border-color: var(--green); }
+  .clases-filtros input[type=text] { flex: 1; min-width: 140px; }
+  .clases-filtros input[type=date] { min-width: 130px; }
+  .filtros-count { font-size: .78rem; color: var(--muted); margin-left: 4px; white-space: nowrap; align-self: center; }
+  .btn-clear-filtros {
+    padding: 7px 12px; background: transparent; border: 1px solid #331a1a;
+    color: var(--danger); border-radius: 8px; cursor: pointer; font-size: .78rem;
+    font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap;
+    transition: background .2s;
+  }
+  .btn-clear-filtros:hover { background: #ff525211; }
+
+  /* ── NOTA COACH ── */
+  .nota-coach-wrap {
+    background: #1a1a0d; border: 1px solid #3a3310; border-radius: 8px;
+    padding: 10px 13px; margin-top: 10px;
+  }
+  .nota-coach-label {
+    font-size: .72rem; font-weight: 700; color: var(--warn); text-transform: uppercase;
+    letter-spacing: .5px; margin-bottom: 5px; display: flex; align-items: center; gap: 5px;
+  }
+  .nota-coach-text { font-size: .88rem; color: var(--text); line-height: 1.5; white-space: pre-wrap; }
+  .nota-coach-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 12px; font-size: .7rem; font-weight: 600;
+    background: #3a3310; color: var(--warn); margin-left: 6px;
+  }
+
+  /* ── PLAN DE CLASE ── */
+  .plan-golpe-titulo {
+    font-size: .78rem; font-weight: 700; color: var(--green); text-transform: uppercase;
+    letter-spacing: .5px; margin: 14px 0 8px; display: flex; align-items: center; gap: 8px;
+  }
+  .plan-golpe-titulo::after { content:''; flex:1; height:1px; background:#1a271a; }
+  .ejercicio-check-row {
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+    background: var(--surface2); border-radius: 8px; margin-bottom: 6px;
+    border: 1px solid transparent; cursor: pointer; transition: border-color .15s;
+  }
+  .ejercicio-check-row.selected { border-color: var(--green); background: #0d2e1a; }
+  .ej-check-box {
+    width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid #2a4a2a;
+    flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center;
+    font-size: .75rem; transition: all .15s;
+  }
+  .ejercicio-check-row.selected .ej-check-box { background: var(--green); border-color: var(--green); color: #000; }
+  .ej-check-info { flex: 1; }
+  .ej-check-name { font-weight: 600; font-size: .88rem; }
+  .ej-check-desc { font-size: .78rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+  .plan-empty { color: var(--muted); font-size: .83rem; padding: 8px 0; font-style: italic; }
+
+  /* ── VER CLASE CON PLAN ── */
+  .plan-ejercicio-item {
+    padding: 12px 14px; background: var(--surface2); border-radius: 8px;
+    border-left: 3px solid var(--green); margin-bottom: 8px;
+  }
+  .plan-ejercicio-nombre { font-weight: 600; font-size: .9rem; margin-bottom: 3px; }
+  .plan-ejercicio-desc { font-size: .82rem; color: var(--muted); line-height: 1.4; }
+
+  /* ── INFORME ── */
+  .informe-wrap { background:#fff; color:#1a1a1a; border-radius:12px; padding:28px; font-family:'DM Sans',sans-serif; }
+  .informe-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:22px; padding-bottom:18px; border-bottom:2px solid #00b248; }
+  .informe-logo { font-family:'Bebas Neue',sans-serif; font-size:1.9rem; color:#00b248; letter-spacing:2px; }
+  .informe-titulo { font-size:.9rem; color:#444; margin-top:2px; }
+  .informe-fecha-emision { font-size:.75rem; color:#888; text-align:right; }
+  .informe-alumno-header { display:flex; align-items:center; gap:14px; background:#f4fdf4; border-radius:10px; padding:14px 18px; margin-bottom:20px; }
+  .informe-avatar { width:48px; height:48px; border-radius:50%; background:#00b248; color:#fff; font-weight:700; font-size:1.2rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .informe-alumno-nombre { font-size:1.1rem; font-weight:600; color:#1a1a1a; }
+  .informe-alumno-meta { font-size:.8rem; color:#666; margin-top:2px; }
+  .informe-level-badge { display:inline-block; padding:3px 11px; border-radius:20px; font-size:.72rem; font-weight:600; margin-top:5px; }
+  .badge-principiante { background:#e8f5e9; color:#2e7d32; }
+  .badge-intermedio { background:#fff8e1; color:#f57f17; }
+  .badge-avanzado { background:#fce4ec; color:#c62828; }
+  .informe-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px; }
+  .informe-stat { background:#f4fdf4; border-radius:8px; padding:12px 14px; text-align:center; }
+  .informe-stat-num { font-family:'Bebas Neue',sans-serif; font-size:1.9rem; color:#00b248; }
+  .informe-stat-label { font-size:.7rem; color:#666; text-transform:uppercase; letter-spacing:.5px; }
+  .informe-seccion-titulo { font-size:.7rem; font-weight:700; color:#00b248; text-transform:uppercase; letter-spacing:.7px; margin:18px 0 9px; display:flex; align-items:center; gap:7px; }
+  .informe-seccion-titulo::after { content:''; flex:1; height:1px; background:#d4edda; }
+  .informe-clase-item { border:1px solid #e0e0e0; border-radius:8px; margin-bottom:9px; overflow:hidden; }
+  .informe-clase-header { display:flex; align-items:center; justify-content:space-between; padding:9px 13px; background:#f9f9f9; border-bottom:1px solid #f0f0f0; }
+  .informe-clase-fecha { font-weight:600; font-size:.88rem; color:#1a1a1a; }
+  .informe-clase-meta { font-size:.75rem; color:#888; }
+  .informe-clase-body { padding:9px 13px; }
+  .informe-tag { display:inline-block; padding:2px 8px; border-radius:12px; font-size:.7rem; background:#e8f5e9; color:#2e7d32; margin:2px; }
+  .informe-correccion { background:#fffbf0; border-left:3px solid #f9a825; border-radius:0 6px 6px 0; padding:7px 11px; margin-top:7px; font-size:.81rem; color:#444; line-height:1.5; }
+  .informe-ejercicio-item { display:flex; align-items:flex-start; gap:7px; padding:5px 0; border-bottom:1px solid #f5f5f5; }
+  .informe-ejercicio-item:last-child { border-bottom:none; }
+  .informe-ej-dot { width:5px; height:5px; border-radius:50%; background:#00b248; flex-shrink:0; margin-top:6px; }
+  .informe-ej-nombre { font-size:.81rem; font-weight:600; color:#1a1a1a; }
+  .informe-ej-desc { font-size:.72rem; color:#666; line-height:1.4; margin-top:1px; }
+  .informe-footer { margin-top:24px; padding-top:14px; border-top:1px solid #e0e0e0; display:flex; justify-content:space-between; align-items:center; }
+  .informe-footer-logo { font-family:'Bebas Neue',sans-serif; font-size:1rem; color:#00b248; letter-spacing:1px; }
+  .informe-footer-meta { font-size:.7rem; color:#aaa; }
+  .informe-sin-ej { font-size:.76rem; color:#aaa; font-style:italic; padding:3px 0; }
+  #modal-informe .modal { width:700px; max-width:98vw; }
+  .informe-print-btns { display:flex; gap:8px; margin-bottom:14px; }
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">🎾 PádelPro</div>
+    <div class="login-sub">Gestión de clases personalizadas</div>
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="setRole(&#39;coach&#39;)">Entrenador</button>
+      <button class="role-tab" onclick="setRole(&#39;alumno&#39;)">Alumno</button>
+    </div>
+    <div class="field">
+      <label>Usuario</label>
+      <input type="text" id="login-user" placeholder="Tu nombre de usuario">
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" placeholder="••••••••">
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Entrar</button>
+    <div class="login-hint">Coach: <b>coach / 1234</b> &nbsp;|&nbsp; Alumno: nombre / 1234</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">🎾 PádelPro</div>
+    <div class="topbar-user">
+      <div class="avatar" id="top-avatar">C</div>
+      <span id="top-name" style="font-size:.9rem;font-weight:500"></span>
+      <button class="btn-backup" onclick="openBackup()">💾 Backup</button>
+      <button class="btn-logout" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+
+  <!-- MODAL BACKUP -->
+  <div class="backup-overlay" id="backup-overlay" onclick="closeBackupIfOutside(event)">
+    <div class="backup-modal">
+      <h3>💾 Backup de Datos</h3>
+      <p>Exporta tus datos para guardarlos o pasarlos a otro dispositivo. Importa un backup para restaurar.</p>
+      <div class="backup-actions">
+        <button class="btn-export" onclick="exportarDatos()">⬇️ Exportar (descargar JSON)</button>
+        <button class="btn-import" onclick="document.getElementById('import-file').click()">⬆️ Importar (cargar JSON)</button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importarDatos(event)">
+        <button class="btn-close-backup" onclick="closeBackup()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+  <div class="nav-tabs" id="nav-tabs"></div>
+  <div class="main">
+    <!-- PÁGINAS COACH -->
+    <div class="page" id="page-dashboard">
+      <div class="section-title">Panel General</div>
+      <div class="grid-3" id="stats-grid"></div>
+      <br>
+      <div class="section-title" style="font-size:1.2rem">Próximas Clases</div>
+      <div id="proximas-list"></div>
+    </div>
+
+    <div class="page" id="page-alumnos">
+      <div class="flex-between">
+        <div class="section-title">Mis Alumnos</div>
+        <button class="btn-sm btn-green" onclick="openModal(&#39;modal-nuevo-alumno&#39;)">+ Nuevo Alumno</button>
+      </div>
+      <div class="grid-2" id="alumnos-grid"></div>
+    </div>
+
+    <div class="page" id="page-clases">
+      <div class="flex-between">
+        <div class="section-title">Registro de Clases</div>
+        <button class="btn-sm btn-green" onclick="openModal(&#39;modal-nueva-clase&#39;)">+ Registrar Clase</button>
+      </div>
+      <div class="clases-filtros">
+        <select id="cf-alumno" onchange="renderClases()">
+          <option value="">👤 Todos los alumnos</option>
+        </select>
+        <select id="cf-estado" onchange="renderClases()">
+          <option value="">📋 Todos los estados</option>
+          <option value="realizada">✓ Realizadas</option>
+          <option value="pendiente">⏳ Pendientes</option>
+        </select>
+        <input type="text" id="cf-golpe" placeholder="🎾 Buscar golpe..." oninput="renderClases()">
+        <input type="date" id="cf-desde" onchange="renderClases()" title="Desde">
+        <input type="date" id="cf-hasta" onchange="renderClases()" title="Hasta">
+        <span class="filtros-count" id="cf-count"></span>
+        <button class="btn-clear-filtros" id="cf-clear" onclick="limpiarFiltrosClases()" style="display:none">✕ Limpiar</button>
+      </div>
+      <div id="clases-list"></div>
+    </div>
+
+    <div class="page" id="page-biblioteca">
+      <div class="flex-between">
+        <div class="section-title">Biblioteca de Ejercicios</div>
+        <button class="btn-sm btn-green" onclick="openModal(&#39;modal-nuevo-ejercicio&#39;)">+ Nuevo Ejercicio</button>
+      </div>
+      <div class="bib-filter">
+        <select id="bib-filtro-golpe" onchange="renderBiblioteca()">
+          <option value="">Todos los golpes</option>
+        </select>
+        <input type="text" id="bib-buscar" placeholder="🔍 Buscar ejercicio..." oninput="renderBiblioteca()">
+      </div>
+      <div id="biblioteca-list"></div>
+    </div>
+
+    <div class="page" id="page-calendario">
+      <div class="section-title">Calendario</div>
+      <div class="card">
+        <div class="cal-nav">
+          <button onclick="calPrev()">‹</button>
+          <span id="cal-titulo"></span>
+          <button onclick="calNext()">›</button>
+          <button class="btn-sm btn-green" style="margin-left:auto" onclick="openModal(&#39;modal-agendar&#39;)">+ Agendar</button>
+        </div>
+        <div class="cal-grid" id="cal-header"></div>
+        <div class="cal-grid" id="cal-body"></div>
+      </div>
+      <br>
+      <div id="eventos-dia" class="card" style="display:none"></div>
+    </div>
+
+    <div class="page" id="page-progreso">
+      <div class="card">
+        <div class="chart-alumno-sel">
+          <label>Alumno</label>
+          <select id="progreso-sel-alumno" onchange="renderProgreso()"></select>
+        </div>
+        <div id="progreso-body"></div>
+      </div>
+    </div>
+
+    <!-- PÁGINA ALUMNO -->
+    <div class="page" id="page-mi-perfil">
+      <div class="section-title" id="alumno-perfil-title">Mi Perfil</div>
+      <div class="inner-tabs">
+        <button class="inner-tab active" onclick="showInnerTab(&#39;perfil-panel&#39;)">👤 Mi Perfil</button>
+        <button class="inner-tab" onclick="showInnerTab(&#39;progreso-panel&#39;)">📈 Mi Progreso</button>
+      </div>
+
+      <div class="inner-panel active" id="perfil-panel">
+        <div class="grid-2">
+          <div>
+            <div class="card" style="margin-bottom:16px">
+              <div style="font-weight:600;margin-bottom:12px">Mi Nivel</div>
+              <div id="alumno-golpes-list"></div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:16px">
+              <div style="font-weight:600;margin-bottom:12px">Mis Correcciones</div>
+              <div id="alumno-correcciones-list"></div>
+            </div>
+          </div>
+        </div>
+        <div class="section-title" style="font-size:1.2rem;margin-top:8px">Mis Clases</div>
+        <div id="alumno-clases-list"></div>
+      </div>
+
+      <div class="inner-panel" id="progreso-panel">
+        <div class="card">
+          <div id="alumno-progreso-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-mi-calendario">
+      <div class="section-title">Mi Calendario</div>
+      <div class="card">
+        <div class="cal-nav">
+          <button onclick="calPrev()">‹</button>
+          <span id="cal-titulo2"></span>
+          <button onclick="calNext()">›</button>
+        </div>
+        <div class="cal-grid" id="cal-header2"></div>
+        <div class="cal-grid" id="cal-body2"></div>
+      </div>
+      <br>
+      <div id="eventos-dia2" class="card" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALES -->
+<!-- Nuevo Alumno -->
+<div class="modal-overlay" id="modal-nuevo-alumno">
+  <div class="modal">
+    <div class="modal-title">Nuevo Alumno</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="na-nombre" placeholder="Nombre completo">
+      </div>
+      <div class="form-group">
+        <label>Apellido</label>
+        <input type="text" id="na-apellido" placeholder="Apellido">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Usuario (login)</label>
+        <input type="text" id="na-user" placeholder="ej: carlos">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="na-pass" placeholder="••••••••">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nivel</label>
+        <select id="na-nivel">
+          <option value="Principiante">Principiante</option>
+          <option value="Intermedio">Intermedio</option>
+          <option value="Avanzado">Avanzado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="text" id="na-tel" placeholder="Opcional">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notas iniciales</label>
+      <textarea id="na-notas" placeholder="Observaciones..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-outline" onclick="closeModal(&#39;modal-nuevo-alumno&#39;)">Cancelar</button>
+      <button class="btn-sm btn-green" onclick="crearAlumno()">Crear Alumno</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ver Alumno -->
+<div class="modal-overlay" id="modal-ver-alumno">
+  <div class="modal">
+    <div class="modal-title" id="ver-alumno-titulo"></div>
+    <div id="ver-alumno-body"></div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-outline" onclick="closeModal(&#39;modal-ver-alumno&#39;)">Cerrar</button>
+      <button class="btn-sm btn-green" onclick="editarNivelAlumno()">Editar Nivel / Golpes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Editar Nivel -->
+<div class="modal-overlay" id="modal-nivel">
+  <div class="modal">
+    <div class="modal-title" id="nivel-titulo">Nivel del Alumno</div>
+    <div id="nivel-body"></div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-outline" onclick="closeModal(&#39;modal-nivel&#39;)">Cancelar</button>
+      <button class="btn-sm btn-green" onclick="guardarNivel()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nueva Clase -->
+<div class="modal-overlay" id="modal-nueva-clase">
+  <div class="modal">
+    <div class="modal-title">Registrar Clase</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Alumno</label>
+        <select id="nc-alumno"></select>
+      </div>
+      <div class="form-group">
+        <label>Fecha</label>
+        <input type="date" id="nc-fecha">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Golpes trabajados</label>
+      <div class="golpes-chips" id="nc-golpes-chips" style="margin-bottom:4px"></div>
+    </div>
+    <div class="form-group">
+      <label>Plan de ejercicios <span style="color:var(--muted);font-weight:400;text-transform:none;font-size:.78rem">— elegí los que vas a dar</span></label>
+      <div id="nc-plan-ejercicios"><div class="plan-empty">Seleccioná golpes arriba para ver los ejercicios disponibles.</div></div>
+    </div>
+    <div class="form-group">
+      <label>Correcciones / Notas para el alumno <span style="color:var(--muted);font-weight:400;text-transform:none;font-size:.75rem">— visible para el alumno</span></label>
+      <textarea id="nc-correcciones" placeholder="Correcciones específicas..."></textarea>
+    </div>
+    <div class="form-group">
+      <label style="color:var(--warn)">📝 Nota privada del coach <span style="color:var(--muted);font-weight:400;text-transform:none;font-size:.75rem">— solo vos la ves</span></label>
+      <textarea id="nc-nota-coach" placeholder="Memo rápido: qué funcionó, próximos objetivos, observaciones..." style="border-color:#3a3310;background:#1a1a0d;min-height:70px"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Duración (min)</label>
+        <input type="number" id="nc-duracion" value="60">
+      </div>
+      <div class="form-group">
+        <label>Estado</label>
+        <select id="nc-estado">
+          <option value="realizada">Realizada</option>
+          <option value="pendiente">Pendiente</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-outline" onclick="closeModal(&#39;modal-nueva-clase&#39;)">Cancelar</button>
+      <button class="btn-sm btn-green" onclick="crearClase()">Guardar Clase</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nuevo Ejercicio -->
+<div class="modal-overlay" id="modal-nuevo-ejercicio">
+  <div class="modal">
+    <div class="modal-title">Nuevo Ejercicio</div>
+    <div class="form-group">
+      <label>Nombre del ejercicio</label>
+      <input type="text" id="ne-nombre" placeholder="Ej: Peloteo cruzado de derecha">
+    </div>
+    <div class="form-group">
+      <label>Golpe asociado</label>
+      <select id="ne-golpe"></select>
+    </div>
+    <div class="form-group">
+      <label>Descripción / Instrucciones</label>
+      <textarea id="ne-desc" placeholder="Describe cómo se ejecuta el ejercicio..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-outline" onclick="closeModal(&#39;modal-nuevo-ejercicio&#39;)">Cancelar</button>
+      <button class="btn-sm btn-green" onclick="crearEjercicio()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ver Clase -->
+<div class="modal-overlay" id="modal-ver-clase">
+  <div class="modal">
+    <div class="modal-title" id="ver-clase-titulo"></div>
+    <div id="ver-clase-body"></div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-outline" onclick="closeModal(&#39;modal-ver-clase&#39;)">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Editar Clase -->
+<div class="modal-overlay" id="modal-editar-clase">
+  <div class="modal">
+    <div class="modal-title">Editar Clase</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Alumno</label>
+        <select id="ec-alumno"></select>
+      </div>
+      <div class="form-group">
+        <label>Fecha</label>
+        <input type="date" id="ec-fecha">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Golpes trabajados</label>
+      <div class="golpes-chips" id="ec-golpes-chips"></div>
+    </div>
+    <div class="form-group">
+      <label>Correcciones / Notas para el alumno <span style="color:var(--muted);font-weight:400;text-transform:none;font-size:.75rem">— visible para el alumno</span></label>
+      <textarea id="ec-correcciones" placeholder="Correcciones específicas..."></textarea>
+    </div>
+    <div class="form-group">
+      <label style="color:var(--warn)">📝 Nota privada del coach <span style="color:var(--muted);font-weight:400;text-transform:none;font-size:.75rem">— solo vos la ves</span></label>
+      <textarea id="ec-nota-coach" placeholder="Memo rápido: qué funcionó, próximos objetivos, observaciones..." style="border-color:#3a3310;background:#1a1a0d;min-height:70px"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Duración (min)</label>
+        <input type="number" id="ec-duracion" value="60">
+      </div>
+      <div class="form-group">
+        <label>Estado</label>
+        <select id="ec-estado">
+          <option value="realizada">Realizada</option>
+          <option value="pendiente">Pendiente</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-outline" onclick="closeModal(&#39;modal-editar-clase&#39;)">Cancelar</button>
+      <button class="btn-sm btn-green" onclick="guardarClaseEditada()">Guardar Cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- Agendar -->
+<div class="modal-overlay" id="modal-agendar">
+  <div class="modal">
+    <div class="modal-title">Agendar Clase</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Alumno</label>
+        <select id="ag-alumno"></select>
+      </div>
+      <div class="form-group">
+        <label>Fecha</label>
+        <input type="date" id="ag-fecha">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Hora</label>
+        <input type="time" id="ag-hora" value="09:00">
+      </div>
+      <div class="form-group">
+        <label>Duración (min)</label>
+        <input type="number" id="ag-duracion" value="60">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notas</label>
+      <textarea id="ag-notas" placeholder="Opcional..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-outline" onclick="closeModal(&#39;modal-agendar&#39;)">Cancelar</button>
+      <button class="btn-sm btn-green" onclick="crearEvento()">Agendar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  DATOS INICIALES
+// ══════════════════════════════════════════
+const GOLPES_PADEL = ['Derecha', 'Revés', 'Volea de derecha', 'Volea de revés', 'Bandeja', 'Víbora', 'Smash', 'Saque', 'Globo', 'Pared', 'Rulo', 'Gancho', 'Bajada de pared', 'Salida de pared de derecha', 'Salida de pared de revés', 'Doble pared que abre', 'Doble pared que cierra', 'Giro simple', 'Giro con doble pared'];
+
+const EJERCICIOS_DEFAULT = [
+  // ── DERECHA ──
+  { golpe: 'Derecha', nombre: 'Ej 1 — Canasto: Derecha con objetivo', desc: 'El jugador gira el cono, avanza con pasos laterales hacia el centro de la cancha y ejecuta una derecha. Objetivo 1: corto a mitad de cancha. Objetivo 2: largo, que bote detrás de la línea de saque.' },
+  { golpe: 'Derecha', nombre: 'Ej 2 — Canasto: Derecha cruzada y paralela', desc: 'Misma dinámica de entrada con pasos laterales. El jugador ejecuta la derecha alternando dirección: primero cruzada, luego paralela. Repetir en series de 4.' },
+  { golpe: 'Derecha', nombre: 'Ej 3 — Control: Peloteo de derecha con el coach', desc: 'Control y regularidad. El jugador pelotea de derecha con el coach desde el fondo, buscando mantener el ritmo, la dirección y la profundidad del golpe.' },
+  { golpe: 'Derecha', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado desde el fondo. El coach construye el punto y busca la derecha del jugador. El jugador decide dirección, profundidad y cuándo atacar. Bola viva, situación real de partido.' },
+
+  // ── REVÉS ──
+  { golpe: 'Revés', nombre: 'Ej 1 — Canasto: Revés con objetivo', desc: 'El jugador gira el cono, avanza con pasos laterales hacia el centro y ejecuta el revés. Objetivo 1: corto a mitad de cancha. Objetivo 2: largo, detrás de la línea de saque.' },
+  { golpe: 'Revés', nombre: 'Ej 2 — Canasto: Revés cruzado y paralelo', desc: 'Misma entrada con pasos laterales. Alterna dirección: primero cruzado, luego paralelo. Énfasis en posición del cuerpo y giro de hombros.' },
+  { golpe: 'Revés', nombre: 'Ej 3 — Control: Peloteo de revés con el coach', desc: 'Control y regularidad. El jugador pelotea de revés con el coach desde el fondo, buscando consistencia en la dirección y la profundidad.' },
+  { golpe: 'Revés', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado desde el fondo. El coach construye el punto buscando el revés del jugador. El jugador decide dirección y momento de ataque. Bola viva, situación real de partido.' },
+
+  // ── VOLEA DE DERECHA ──
+  { golpe: 'Volea de derecha', nombre: 'Ej 1 — Canasto: Volea de derecha alta y baja', desc: 'El jugador posicionado en la red ejecuta volea de derecha. El coach lanza alternando pelotas altas y bajas. Objetivo: controlar la dirección sin retroceder.' },
+  { golpe: 'Volea de derecha', nombre: 'Ej 2 — Canasto: Volea de derecha cruzada y paralela', desc: 'Desde la red, el jugador voleea de derecha alternando dirección: cruzada y paralela. El coach lanza a ritmo constante.' },
+  { golpe: 'Volea de derecha', nombre: 'Ej 3 — Control: Doble volea derecha-revés', desc: 'El coach lanza dos pelotas seguidas: una al lado derecho y otra al izquierdo. El jugador voleea ambas sin salir de posición. Foco en la muñeca firme y el control.' },
+  { golpe: 'Volea de derecha', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'El jugador sube a la red y juega el punto. El coach ataca desde el fondo. El jugador voleea de derecha en situación real, decidiendo dirección y profundidad para cerrar el punto.' },
+
+  // ── VOLEA DE REVÉS ──
+  { golpe: 'Volea de revés', nombre: 'Ej 1 — Canasto: Volea de revés alta y baja', desc: 'El jugador en la red ejecuta volea de revés. El coach lanza alternando alturas. Trabajar muñeca firme y dirección del golpe.' },
+  { golpe: 'Volea de revés', nombre: 'Ej 2 — Canasto: Volea de revés cruzada y paralela', desc: 'Desde la red, el jugador voleea de revés hacia zona cruzada y luego paralela. El coach lanza a ritmo constante.' },
+  { golpe: 'Volea de revés', nombre: 'Ej 3 — Control: Doble volea con énfasis en revés', desc: 'El coach lanza en serie alternando derecha y revés, con más frecuencia al lado del revés. El jugador trabaja la continuidad y el cambio rápido de lado.' },
+  { golpe: 'Volea de revés', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'El jugador sube a la red y juega el punto completo. El coach busca el lado del revés para presionar. El jugador decide y resuelve en situación real de partido.' },
+
+  // ── BANDEJA ──
+  { golpe: 'Bandeja', nombre: 'Ej 1 — Canasto: Bandeja al centro', desc: 'El coach lanza pelotas altas. El jugador posiciona y ejecuta bandeja hacia el centro del fondo para mantener la posición ofensiva.' },
+  { golpe: 'Bandeja', nombre: 'Ej 2 — Canasto: Bandeja cruzada y paralela', desc: 'El coach lanza globos alternados. El jugador ejecuta bandejas dirigiendo: una cruzada, una paralela. Foco en la dirección y el efecto.' },
+  { golpe: 'Bandeja', nombre: 'Ej 3 — Control: Subida a la red + bandeja continuada', desc: 'El jugador sube a la red y el coach devuelve globos repetidos. El jugador encadena varias bandejas consecutivas sin perder la posición en la red.' },
+  { golpe: 'Bandeja', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado completo. El jugador sube a la red y el coach defiende con globos. El jugador decide entre bandeja, víbora o smash según la situación. Bola viva.' },
+
+  // ── VÍBORA ──
+  { golpe: 'Víbora', nombre: 'Ej 1 — Canasto: Víbora al fondo lateral', desc: 'El coach lanza globo central. El jugador ejecuta la víbora golpeando la pelota extendida hacia su derecha, lejos del cuerpo. Objetivo siempre el fondo lateral: más recorrido de pelota, menos error, mejor cobertura de cancha. Es el tiro más efectivo y consistente.' },
+  { golpe: 'Víbora', nombre: 'Ej 2 — Canasto: Víbora fondo lateral cruzado y paralelo', desc: 'El coach lanza globos centrales. El jugador alterna: víbora al fondo lateral cruzado y al fondo lateral paralelo. Siempre buscando el fondo, nunca intentar la lateral directa — tiene menos distancia de recorrido, más riesgo de error y deja la cancha descubierta.' },
+  { golpe: 'Víbora', nombre: 'Ej 3 — Control: Decisión según el globo', desc: 'El coach lanza globos variados. El jugador lee la trayectoria: globo central → víbora al fondo lateral. Globo angulado → gancho o rulo. La víbora siempre busca el fondo lateral por su mayor efectividad y simplicidad de ejecución.' },
+  { golpe: 'Víbora', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado desde la red. El coach defiende con globos variados. El jugador decide: globo central → víbora al fondo lateral, simple y efectiva. Globo angulado → gancho o rulo. Nunca buscar la lateral directa. Bola viva.' },
+
+  // ── SMASH ──
+  { golpe: 'Smash', nombre: 'Ej 1 — Canasto: Smash directo', desc: 'El coach lanza globos altos. El jugador posiciona bajo la pelota y ejecuta el smash con potencia hacia el fondo. Objetivo: zona profunda.' },
+  { golpe: 'Smash', nombre: 'Ej 2 — Canasto: Smash por 3 paredes', desc: 'El coach lanza globo cerca de la pared del fondo. El jugador ejecuta el smash buscando que la pelota golpee la pared trasera y salga por la lateral.' },
+  { golpe: 'Smash', nombre: 'Ej 3 — Control: Smash en movimiento continuo', desc: 'El coach lanza globos continuos a distintas zonas. El jugador se desplaza, posiciona y ejecuta smash repetido. Foco en el timing, el equilibrio y la posición bajo la pelota.' },
+  { golpe: 'Smash', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado desde la red. El coach defiende con globos altos. El jugador decide entre smash directo, por 3 paredes o bandeja según la situación. Bola viva.' },
+
+  // ── SAQUE ──
+  { golpe: 'Saque', nombre: 'Ej 1 — Canasto: Saque a la T y al cuerpo', desc: 'El jugador practica saque plano buscando la zona de la T del cuadro de saque y luego al cuerpo. Series de 10 saques evaluando precisión.' },
+  { golpe: 'Saque', nombre: 'Ej 2 — Canasto: Saque con efecto', desc: 'Saque cortado para que la pelota se abra hacia afuera del cuerpo del rival. Alternar con saque liftado que sube al cuerpo.' },
+  { golpe: 'Saque', nombre: 'Ej 3 — Control: Saque + volea', desc: 'El jugador saca y sube a la red. El coach devuelve. El jugador voleea para cerrar el punto. Trabaja el esquema saque-volea en continuidad.' },
+  { golpe: 'Saque', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Juego de saque completo. El jugador saca, el coach devuelve libremente y se juega el punto. El jugador trabaja la táctica de saque según el rival. Bola viva.' },
+
+  // ── GLOBO ──
+  { golpe: 'Globo', nombre: 'Ej 1 — Canasto: Globo defensivo', desc: 'El coach ataca desde la red. El jugador defiende con globo alto hacia el fondo, buscando pasar sobre la cabeza del coach y recuperar la posición.' },
+  { golpe: 'Globo', nombre: 'Ej 2 — Canasto: Globo ofensivo cruzado y paralelo', desc: 'El jugador construye el globo con dirección: cruzado apuntando al rincón más difícil, o paralelo al pasillo. El coach evalúa la trayectoria y el efecto.' },
+  { golpe: 'Globo', nombre: 'Ej 3 — Control: Defensa en serie con globo', desc: 'El coach smashea continuo desde la red. El jugador defiende con globos repetidos, buscando mantener la pelota en juego y recuperar cada vez la posición base.' },
+  { golpe: 'Globo', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado completo. El coach presiona desde la red. El jugador defiende con globo cuando corresponde y decide cuándo cambiar de dinámica. Bola viva.' },
+
+  // ── RULO ──
+  { golpe: 'Rulo', nombre: 'Ej 1 — Canasto: Rulo de derecha', desc: 'El coach lanza pelotas altas por el lado derecho en la zona de la red. El jugador ejecuta el rulo con giro de muñeca hacia abajo. Objetivo: que bote en el cuadro contrario.' },
+  { golpe: 'Rulo', nombre: 'Ej 2 — Canasto: Rulo cruzado y paralelo', desc: 'Misma dinámica. El jugador alterna: un rulo cruzado y uno paralelo. Foco en la dirección del giro de muñeca y el efecto sobre la pelota.' },
+  { golpe: 'Rulo', nombre: 'Ej 3 — Control: Bandeja + rulo en serie', desc: 'El coach lanza globos continuos. El jugador alterna una bandeja y un rulo. Trabaja la decisión rápida y la diferencia de ejecución entre ambos golpes.' },
+  { golpe: 'Rulo', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado en la red. El coach defiende con globos. El jugador decide cuándo usar el rulo para sorprender al rival. Bola viva, situación real de partido.' },
+
+  // ── GANCHO ──
+  { golpe: 'Gancho', nombre: 'Ej 1 — Canasto: Gancho de revés', desc: 'Pelotas altas por el lado del revés en la red. El jugador ejecuta el gancho curvando la trayectoria hacia el rincón opuesto. Trabajar el giro de muñeca.' },
+  { golpe: 'Gancho', nombre: 'Ej 2 — Canasto: Gancho cruzado y paralelo', desc: 'Misma dinámica. El jugador alterna un gancho cruzado buscando el ángulo máximo y uno paralelo buscando el pasillo. Foco en la dirección del giro.' },
+  { golpe: 'Gancho', nombre: 'Ej 3 — Control: Rulo + gancho en serie', desc: 'El coach lanza globos alternados por el lado derecho e izquierdo. El jugador ejecuta rulo cuando la pelota va al lado derecho y gancho al lado del revés.' },
+  { golpe: 'Gancho', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado en la red. El coach defiende con globos. El jugador decide entre bandeja, rulo o gancho según la altura y el lado. Bola viva.' },
+
+  // ── BAJADA DE PARED ──
+  { golpe: 'Bajada de pared', nombre: 'Ej 1 — Canasto: Bajada de pared básica', desc: 'El coach lanza pelotas que rebotan en la pared del fondo. El jugador lee el rebote, se posiciona y golpea antes del segundo bote, dirigiendo la pelota hacia la red.' },
+  { golpe: 'Bajada de pared', nombre: 'Ej 2 — Canasto: Bajada con definición al pasillo', desc: 'Misma dinámica. El jugador agrega dirección al terminar la bajada: golpea al pasillo o al cuerpo del rival para intentar definir el punto.' },
+  { golpe: 'Bajada de pared', nombre: 'Ej 3 — Control: Bajada de pared en continuidad', desc: 'El coach envía pelotas repetidas a la pared del fondo. El jugador resuelve bajada tras bajada, volviendo al centro entre golpe y golpe. Foco en el timing y la posición.' },
+  { golpe: 'Bajada de pared', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado completo. El coach busca la pared del fondo para sacar al jugador. El jugador resuelve la bajada y continúa el punto. Bola viva, situación real.' },
+
+  // ── SALIDA DE PARED DE DERECHA ──
+  { golpe: 'Salida de pared de derecha', nombre: 'Ej 1 — Canasto: Salida por la derecha', desc: 'El coach lanza pelotas que salen de la pared lateral derecha. El jugador ajusta la posición y golpea controlado, dirigiendo al centro o al pasillo contrario.' },
+  { golpe: 'Salida de pared de derecha', nombre: 'Ej 2 — Canasto: Salida por derecha cruzada y paralela', desc: 'Misma dinámica. El jugador alterna la dirección del golpe tras la salida: cruzado y paralelo. Foco en anticipar el rebote y abrir el cuerpo.' },
+  { golpe: 'Salida de pared de derecha', nombre: 'Ej 3 — Control: Salida de pared en continuidad', desc: 'El coach envía pelotas repetidas a la pared lateral derecha. El jugador resuelve la salida una y otra vez, volviendo al centro. Foco en leer el rebote rápido.' },
+  { golpe: 'Salida de pared de derecha', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado completo. El coach busca la pared lateral derecha para sacar al jugador. El jugador resuelve la salida y continúa el punto. Bola viva.' },
+
+  // ── SALIDA DE PARED DE REVÉS ──
+  { golpe: 'Salida de pared de revés', nombre: 'Ej 1 — Canasto: Salida por el revés', desc: 'El coach lanza pelotas que salen de la pared lateral izquierda. El jugador posiciona el cuerpo abierto y ejecuta el golpe de revés controlado.' },
+  { golpe: 'Salida de pared de revés', nombre: 'Ej 2 — Canasto: Salida por revés cruzada y paralela', desc: 'Misma dinámica. El jugador alterna: golpe cruzado y paralelo tras la salida de la pared lateral izquierda. Trabajar la anticipación del rebote.' },
+  { golpe: 'Salida de pared de revés', nombre: 'Ej 3 — Control: Salida de pared en continuidad', desc: 'El coach envía pelotas repetidas a la pared lateral izquierda. El jugador resuelve la salida de revés en serie, volviendo al centro entre golpe y golpe.' },
+  { golpe: 'Salida de pared de revés', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado completo. El coach busca la pared lateral izquierda para presionar al jugador. El jugador resuelve la salida de revés y continúa el punto. Bola viva.' },
+
+  // ── DOBLE PARED QUE ABRE ──
+  { golpe: 'Doble pared que abre', nombre: 'Ej 1 — Canasto: Leer la doble pared que abre', desc: 'El coach lanza pelotas que pegan en el fondo y salen abriendo hacia afuera de la pista. El jugador anticipa la trayectoria, sale a buscar la pelota y la controla.' },
+  { golpe: 'Doble pared que abre', nombre: 'Ej 2 — Canasto: Doble pared que abre con definición', desc: 'Misma dinámica. El jugador resuelve la salida y agrega definición: golpe al pasillo contrario o al cuerpo del rival para terminar el punto.' },
+  { golpe: 'Doble pared que abre', nombre: 'Ej 3 — Control: Doble pared que abre en continuidad', desc: 'El coach envía pelotas repetidas buscando la doble pared que abre. El jugador resuelve en serie, trabajando la lectura del rebote y la vuelta al centro.' },
+  { golpe: 'Doble pared que abre', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado completo. El coach busca la doble pared que abre para dificultar la devolución. El jugador resuelve y continúa el punto. Bola viva.' },
+
+  // ── DOBLE PARED QUE CIERRA ──
+  { golpe: 'Doble pared que cierra', nombre: 'Ej 1 — Canasto: Leer la doble pared que cierra', desc: 'El coach lanza pelotas que salen de la doble pared cerrándose hacia el centro. El jugador se posiciona rápido y golpea al pasillo o zona abierta.' },
+  { golpe: 'Doble pared que cierra', nombre: 'Ej 2 — Canasto: Doble pared que cierra con definición', desc: 'Misma dinámica. El jugador resuelve la salida y busca el pasillo contrario para no devolver sin ángulo al centro.' },
+  { golpe: 'Doble pared que cierra', nombre: 'Ej 3 — Control: Doble pared que cierra en continuidad', desc: 'El coach envía pelotas repetidas buscando la doble pared que cierra. El jugador trabaja la lectura del rebote en serie y la vuelta al centro entre golpe y golpe.' },
+  { golpe: 'Doble pared que cierra', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado completo. El coach busca la doble pared que cierra para presionar al jugador. El jugador resuelve y continúa el punto. Bola viva.' },
+
+  // ── GIRO SIMPLE ──
+  { golpe: 'Giro simple', nombre: 'Ej 1 — Canasto: Giro 180°', desc: 'El coach lanza pelotas altas que pasan sobre la cabeza del jugador. El jugador gira 180°, deja que la pelota golpee la pared del fondo y la ejecuta de espaldas a la red.' },
+  { golpe: 'Giro simple', nombre: 'Ej 2 — Canasto: Giro con definición al volver', desc: 'Misma dinámica. Tras ejecutar el giro, el jugador vuelve al centro y el coach le da una pelota para definir. Trabaja la transición giro-golpe de ataque.' },
+  { golpe: 'Giro simple', nombre: 'Ej 3 — Control: Giro en continuidad', desc: 'El coach smashea repetido alto al fondo. El jugador gira una y otra vez, trabajando el timing del giro, la posición bajo la pelota y la vuelta al centro.' },
+  { golpe: 'Giro simple', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado completo. El coach smashea alto al fondo. El jugador decide cuándo girar y cuándo no. Resuelve el giro y continúa el punto. Bola viva.' },
+
+  // ── GIRO CON DOBLE PARED ──
+  { golpe: 'Giro con doble pared', nombre: 'Ej 1 — Canasto: Giro + doble pared', desc: 'El coach lanza smash fuerte al fondo. El jugador gira, espera que la pelota pegue en la pared trasera y lateral, y la golpea tras el rebote en las dos paredes.' },
+  { golpe: 'Giro con doble pared', nombre: 'Ej 2 — Canasto: Giro + doble pared con definición', desc: 'Misma dinámica. Tras resolver el giro con doble pared, el jugador agrega dirección al golpe buscando el pasillo o el cuerpo del rival.' },
+  { golpe: 'Giro con doble pared', nombre: 'Ej 3 — Control: Giro con doble pared en continuidad', desc: 'El coach smashea repetido buscando siempre la doble pared. El jugador trabaja el giro y la lectura del rebote en serie, volviendo al centro entre golpe y golpe.' },
+  { golpe: 'Giro con doble pared', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado completo. El coach smashea buscando la doble pared. El jugador decide cuándo girar y resuelve la situación en tiempo real. Bola viva.' },
+
+  // ── PARED ──
+  { golpe: 'Pared', nombre: 'Ej 1 — Canasto: Juego de pared trasera', desc: 'El coach lanza pelotas que pasan por la pared trasera. El jugador lee el rebote, ajusta la posición y golpea controlado hacia el frente.' },
+  { golpe: 'Pared', nombre: 'Ej 2 — Canasto: Dejada con efecto en pared lateral', desc: 'Desde el centro, el jugador dirige la pelota a la pared lateral con efecto para que salga difícil. El coach evalúa el ángulo y la velocidad.' },
+  { golpe: 'Pared', nombre: 'Ej 3 — Control: Peloteo incluyendo paredes', desc: 'El jugador y el coach pelotean libremente. El coach manda pelotas que pasan por distintas paredes. El jugador trabaja la lectura del rebote en cada situación.' },
+  { golpe: 'Pared', nombre: 'Ej 4 — Situación de juego con bola viva', desc: 'Punto jugado completo. El coach busca las paredes para dificultar el juego del jugador. El jugador resuelve cada situación de rebote en tiempo real. Bola viva.' },
+];
+
+const DB_EJERCICIOS_VERSION = 4;
+
+function hoy(offset = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d.toISOString().split('T')[0];
+}
+
+// ── COACHES — editá aquí para cambiar nombre/usuario/contraseña ──
+const COACHES = [
+  { id: 'coach1', nombre: 'Damian',  user: 'coach',  pass: '1234' },
+  { id: 'coach2', nombre: 'Coach 2', user: 'coach2', pass: '1234' },
+];
+
+let db = JSON.parse(localStorage.getItem('padeldb') || 'null');
+function save() { localStorage.setItem('padeldb', JSON.stringify(db)); }
+function getAlumno(id) { return db.alumnos.find(a => a.id === id && a.coachId === currentUser.coachId); }
+function misAlumnos() { return db.alumnos.filter(a => a.coachId === currentUser.coachId); }
+function misClases() { return db.clases.filter(c => c.coachId === currentUser.coachId); }
+function misEventos() { return db.eventos.filter(e => e.coachId === currentUser.coachId); }
+
+if (!db) {
+  db = {
+    alumnos: [
+      { id: 1, coachId: 'coach1', nombre: 'Carlos', apellido: 'López', user: 'carlos', pass: '1234', nivel: 'Intermedio', tel: '', notas: 'Necesita trabajar el revés', golpes: { 'Derecha': 4, 'Revés': 2, 'Volea de derecha': 3, 'Smash': 2, 'Saque': 3 } },
+      { id: 2, coachId: 'coach1', nombre: 'Ana', apellido: 'García', user: 'ana', pass: '1234', nivel: 'Principiante', tel: '', notas: 'Primera temporada', golpes: { 'Derecha': 2, 'Revés': 1, 'Saque': 2 } },
+    ],
+    clases: [
+      { id: 1, coachId: 'coach1', alumnoId: 1, fecha: hoy(-7), golpes: 'Derecha, Volea de derecha', ejercicios: [], correcciones: 'Corregir agarre en la volea. Bajar más las rodillas al golpear.', duracion: 60, estado: 'realizada' },
+      { id: 2, coachId: 'coach1', alumnoId: 2, fecha: hoy(-3), golpes: 'Saque, Derecha', ejercicios: [], correcciones: 'El saque debe ser más fluido. Buen progreso en la derecha.', duracion: 60, estado: 'realizada' },
+    ],
+    eventos: [
+      { id: 1, coachId: 'coach1', alumnoId: 1, fecha: hoy(2), hora: '10:00', duracion: 60, notas: '' },
+      { id: 2, coachId: 'coach1', alumnoId: 2, fecha: hoy(4), hora: '09:00', duracion: 60, notas: 'Traer pelotas' },
+    ],
+    ejercicios: EJERCICIOS_DEFAULT.map((e, i) => ({ id: i + 1, ...e })),
+    nextId: { alumnos: 3, clases: 3, eventos: 3, ejercicios: EJERCICIOS_DEFAULT.length + 1 }
+  };
+  save();
+} else {
+  // migrar: resetear ejercicios precargados si la versión cambió (los del usuario se conservan aparte en el futuro)
+  // migrar: asignar coachId a datos que no lo tienen (instalaciones previas)
+  let migrated = false;
+  db.alumnos.forEach(a => { if (!a.coachId) { a.coachId = 'coach1'; migrated = true; } });
+  db.clases.forEach(cl => { if (!cl.coachId) { const al = db.alumnos.find(a => a.id === cl.alumnoId); cl.coachId = al ? al.coachId : 'coach1'; migrated = true; } });
+  db.eventos.forEach(e => { if (!e.coachId) { const al = db.alumnos.find(a => a.id === e.alumnoId); e.coachId = al ? al.coachId : 'coach1'; migrated = true; } });
+  if (migrated) save();
+
+  if (!db.ejercicios || db._ejVersion !== DB_EJERCICIOS_VERSION) {
+    // conservar solo los ejercicios que el usuario agregó manualmente (id > EJERCICIOS_DEFAULT.length de la versión anterior)
+    const custom = (db.ejercicios || []).filter(e => e._custom);
+    db.ejercicios = [
+      ...EJERCICIOS_DEFAULT.map((e, i) => ({ id: i + 1, ...e })),
+      ...custom
+    ];
+    db._ejVersion = DB_EJERCICIOS_VERSION;
+    db.nextId.ejercicios = db.ejercicios.length + 1;
+    db.clases.forEach(c => { if (!c.ejercicios) c.ejercicios = []; });
+    save();
+  }
+}
+
+
+// ══════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════
+let currentUser = null; // { role: 'coach'|'alumno', coachId?, alumnoId? }
+let loginRole = 'coach';
+
+function setRole(r) {
+  loginRole = r;
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value.trim();
+  if (loginRole === 'coach') {
+    const coach = COACHES.find(c => c.user === u && c.pass === p);
+    if (coach) {
+      currentUser = { role: 'coach', coachId: coach.id, nombre: coach.nombre };
+      enterApp();
+    } else alert('Credenciales incorrectas');
+  } else {
+    const a = db.alumnos.find(x => x.user === u && x.pass === p);
+    if (a) { currentUser = { role: 'alumno', coachId: a.coachId, alumnoId: a.id }; enterApp(); }
+    else alert('Credenciales incorrectas');
+  }
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function openBackup() { document.getElementById('backup-overlay').classList.add('open'); }
+function closeBackup() { document.getElementById('backup-overlay').classList.remove('open'); }
+function closeBackupIfOutside(e) { if (e.target.id === 'backup-overlay') closeBackup(); }
+
+function exportarDatos() {
+  const json = JSON.stringify(db, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fecha = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `padelpro-backup-${fecha}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  closeBackup();
+}
+
+function importarDatos(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.alumnos || !imported.clases) {
+        alert('❌ Archivo inválido. Asegúrate de usar un backup de PádelPro.');
+        return;
+      }
+      if (!confirm('⚠️ Esto reemplazará TODOS los datos actuales con el backup. ¿Continuar?')) return;
+      db = imported;
+      save();
+      closeBackup();
+      alert('✅ Datos importados correctamente. La app se va a recargar.');
+      location.reload();
+    } catch(err) {
+      alert('❌ Error al leer el archivo. Verifica que sea un JSON válido.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function enterApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  const name = currentUser.role === 'coach' ? currentUser.nombre : getAlumno(currentUser.alumnoId).nombre;
+  document.getElementById('top-name').textContent = name;
+  document.getElementById('top-avatar').textContent = name[0].toUpperCase();
+  buildNav();
+  if (currentUser.role === 'coach') showPage('dashboard');
+  else showPage('mi-perfil');
+}
+
+// ══════════════════════════════════════════
+//  NAV
+// ══════════════════════════════════════════
+function buildNav() {
+  const nav = document.getElementById('nav-tabs');
+  const tabs = currentUser.role === 'coach'
+    ? [['dashboard','📊 Dashboard'],['alumnos','👥 Alumnos'],['clases','📋 Clases'],['biblioteca','📚 Ejercicios'],['progreso','📈 Progreso'],['calendario','📅 Calendario']]
+    : [['mi-perfil','👤 Mi Perfil'],['mi-calendario','📅 Calendario']];
+  nav.innerHTML = tabs.map(([id, label]) =>
+    `<div class="nav-tab" id="tab-${id}" onclick="showPage('${id}')">${label}</div>`
+  ).join('');
+}
+
+function showInnerTab(panelId) {
+  document.querySelectorAll('.inner-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+  event.target.classList.add('active');
+  if (panelId === 'progreso-panel') renderAlumnoProgreso();
+}
+
+let calDate = new Date();
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('active');
+  const tab = document.getElementById('tab-' + id);
+  if (tab) tab.classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'alumnos') renderAlumnos();
+  if (id === 'clases') renderClases();
+  if (id === 'biblioteca') renderBiblioteca();
+  if (id === 'progreso') { poblarProgresoSel(); renderProgreso(); }
+  if (id === 'calendario') renderCal('', '');
+  if (id === 'mi-perfil') renderMiPerfil();
+  if (id === 'mi-calendario') renderCal('2', '2');
+}
+
+// ══════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════
+function renderDashboard() {
+  const totalAlumnos = misAlumnos().length;
+  const totalClases = misClases().filter(c => c.estado === 'realizada').length;
+  const proxEvt = misClases().filter(c => c.estado === 'pendiente' && c.fecha >= hoy()).length;
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${totalAlumnos}</div><div class="stat-label">Alumnos activos</div></div>
+    <div class="stat-card"><div class="stat-num">${totalClases}</div><div class="stat-label">Clases realizadas</div></div>
+    <div class="stat-card"><div class="stat-num">${proxEvt}</div><div class="stat-label">Clases agendadas</div></div>
+  `;
+  const proximas = misClases().filter(c => c.estado === 'pendiente' && c.fecha >= hoy())
+    .sort((a, b) => a.fecha.localeCompare(b.fecha)).slice(0, 5);
+  document.getElementById('proximas-list').innerHTML = proximas.length ? proximas.map(c => {
+    const a = getAlumno(c.alumnoId);
+    return `<div class="clase-row" style="cursor:default">
+      <div><div class="clase-title">${a ? a.nombre + ' ' + a.apellido : 'Alumno'}</div><div class="clase-fecha">${formatFecha(c.fecha)}${c.hora ? ' — ' + c.hora + ' hs' : ''} · ${c.duracion} min</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="chip chip-pending">⏳ Pendiente</span>
+        <button class="btn-sm btn-green" style="padding:5px 12px" onclick="completarClase(${c.id})">✅ Dar clase</button>
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty-state"><div class="empty-icon">📅</div>No hay clases agendadas</div>';
+}
+
+// ══════════════════════════════════════════
+//  ALUMNOS
+// ══════════════════════════════════════════
+function renderAlumnos() {
+  const grid = document.getElementById('alumnos-grid');
+  const listaAlumnos = misAlumnos();
+  if (!listaAlumnos.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👥</div>Sin alumnos aún</div>'; return; }
+  grid.innerHTML = listaAlumnos.map(a => {
+    const cls = misClases().filter(c => c.alumnoId === a.id && c.estado === 'realizada').length;
+    return `<div class="alumno-card" onclick="verAlumno(${a.id})">
+      <div class="alumno-name">${a.nombre} ${a.apellido}</div>
+      <span class="alumno-level level-${a.nivel.toLowerCase()}">${a.nivel}</span>
+      <div class="alumno-meta">👤 @${a.user} &nbsp;·&nbsp; ${cls} clase${cls !== 1 ? 's' : ''} realizadas</div>
+      ${a.notas ? `<div class="alumno-meta" style="margin-top:6px;font-style:italic">"${a.notas}"</div>` : ''}
+      <div style="margin-top:12px">
+        <button class="btn-sm btn-informe" onclick="event.stopPropagation(); generarInforme(${a.id})">📄 Ver Informe</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function verAlumno(id) {
+  const a = getAlumno(id);
+  currentAlumnoEdit = id;
+  document.getElementById('ver-alumno-titulo').textContent = `${a.nombre} ${a.apellido}`;
+  const golpesHtml = Object.entries(a.golpes || {}).map(([g, v]) =>
+    `<div class="golpe-item"><span class="golpe-name">${g}</span><span class="golpe-stars">${'★'.repeat(v)}${'☆'.repeat(5 - v)}</span></div>`
+  ).join('') || '<div class="alumno-meta">Sin nivel registrado</div>';
+  const clases = misClases().filter(c => c.alumnoId === id);
+  const corrs = clases.flatMap(c => c.correcciones ? [{ text: c.correcciones, fecha: c.fecha }] : []).slice(-3).reverse();
+  document.getElementById('ver-alumno-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div><b style="color:var(--muted);font-size:.8rem">NIVEL</b><br><span class="alumno-level level-${a.nivel.toLowerCase()}" style="margin-top:6px;display:inline-block">${a.nivel}</span></div>
+      <div><b style="color:var(--muted);font-size:.8rem">USUARIO</b><br><span style="margin-top:6px;display:block">@${a.user}</span></div>
+    </div>
+    <hr>
+    <div style="font-weight:600;margin-bottom:10px">Golpes / Técnica</div>
+    ${golpesHtml}
+    <hr>
+    <div style="font-weight:600;margin-bottom:10px">Últimas correcciones</div>
+    ${corrs.length ? corrs.map(c => `<div class="correccion-item"><div class="correccion-text">${c.text}</div><div class="correccion-meta">${formatFecha(c.fecha)}</div></div>`).join('') : '<div class="alumno-meta">Sin correcciones</div>'}
+  `;
+  openModal('modal-ver-alumno');
+}
+
+let currentAlumnoEdit = null;
+function editarNivelAlumno() {
+  closeModal('modal-ver-alumno');
+  const a = getAlumno(currentAlumnoEdit);
+  document.getElementById('nivel-titulo').textContent = `Nivel — ${a.nombre}`;
+  document.getElementById('nivel-body').innerHTML = `
+    <div class="form-group"><label>Nivel general</label>
+      <select id="edit-nivel"><option>Principiante</option><option>Intermedio</option><option>Avanzado</option></select>
+    </div>
+    <div style="font-weight:600;margin-bottom:10px;font-size:.85rem;color:var(--muted);text-transform:uppercase">Golpes (★ 1-5)</div>
+    ${GOLPES_PADEL.map(g => `
+      <div class="golpe-item">
+        <span class="golpe-name">${g}</span>
+        <div class="stars-select" id="stars-${g.replace(/\s/g,'_')}">
+          ${[1,2,3,4,5].map(n => `<span class="star ${(a.golpes?.[g] || 0) >= n ? 'on' : ''}" onclick="setStar('${g}',${n})">${(a.golpes?.[g] || 0) >= n ? '★' : '☆'}</span>`).join('')}
+        </div>
+      </div>`).join('')}
+  `;
+  document.getElementById('edit-nivel').value = a.nivel;
+  openModal('modal-nivel');
+}
+
+function setStar(golpe, val) {
+  const key = golpe.replace(/\s/g, '_');
+  document.querySelectorAll(`#stars-${key} .star`).forEach((s, i) => {
+    s.textContent = i < val ? '★' : '☆';
+    s.classList.toggle('on', i < val);
+    s.onclick = () => setStar(golpe, i + 1);
+  });
+}
+
+function guardarNivel() {
+  const a = getAlumno(currentAlumnoEdit);
+  a.nivel = document.getElementById('edit-nivel').value;
+  if (!a.golpes) a.golpes = {};
+  GOLPES_PADEL.forEach(g => {
+    const key = g.replace(/\s/g, '_');
+    const on = document.querySelectorAll(`#stars-${key} .star.on`).length;
+    if (on > 0) a.golpes[g] = on;
+  });
+  save(); closeModal('modal-nivel'); renderAlumnos();
+}
+
+function crearAlumno() {
+  const nombre = document.getElementById('na-nombre').value.trim();
+  const apellido = document.getElementById('na-apellido').value.trim();
+  const user = document.getElementById('na-user').value.trim();
+  const pass = document.getElementById('na-pass').value.trim();
+  if (!nombre || !user || !pass) { alert('Nombre, usuario y contraseña son requeridos'); return; }
+  db.alumnos.push({ id: db.nextId.alumnos++, coachId: currentUser.coachId, nombre, apellido, user, pass, nivel: document.getElementById('na-nivel').value, tel: document.getElementById('na-tel').value, notas: document.getElementById('na-notas').value, golpes: {} });
+  save(); closeModal('modal-nuevo-alumno'); renderAlumnos();
+}
+
+// ══════════════════════════════════════════
+//  BIBLIOTECA DE EJERCICIOS
+// ══════════════════════════════════════════
+function renderBiblioteca() {
+  // poblar filtro de golpes
+  const sel = document.getElementById('bib-filtro-golpe');
+  if (sel && sel.options.length <= 1) {
+    GOLPES_PADEL.forEach(g => { const o = document.createElement('option'); o.value = g; o.textContent = g; sel.appendChild(o); });
+  }
+  // poblar select del modal nuevo ejercicio
+  const neGolpe = document.getElementById('ne-golpe');
+  if (neGolpe && !neGolpe.options.length) {
+    GOLPES_PADEL.forEach(g => { const o = document.createElement('option'); o.value = g; o.textContent = g; neGolpe.appendChild(o); });
+  }
+  const filtroGolpe = sel ? sel.value : '';
+  const buscar = (document.getElementById('bib-buscar')?.value || '').toLowerCase();
+  let lista = db.ejercicios;
+  if (filtroGolpe) lista = lista.filter(e => e.golpe === filtroGolpe);
+  if (buscar) lista = lista.filter(e => e.nombre.toLowerCase().includes(buscar) || e.desc.toLowerCase().includes(buscar));
+  const div = document.getElementById('biblioteca-list');
+  if (!lista.length) { div.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div>No hay ejercicios que coincidan</div>'; return; }
+  // agrupar por golpe
+  const grupos = {};
+  lista.forEach(e => { if (!grupos[e.golpe]) grupos[e.golpe] = []; grupos[e.golpe].push(e); });
+  div.innerHTML = Object.entries(grupos).map(([golpe, ejercs]) => `
+    <div style="margin-bottom:6px;font-size:.78rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-top:18px">${golpe}</div>
+    ${ejercs.map(e => `
+      <div class="ejercicio-card">
+        <div class="ejercicio-nombre">${e.nombre}</div>
+        <div class="ejercicio-desc">${e.desc}</div>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          ${!e._default ? `<button class="btn-sm btn-danger" style="padding:4px 10px;font-size:.75rem" onclick="eliminarEjercicio(${e.id})">🗑️ Eliminar</button>` : ''}
+        </div>
+      </div>`).join('')}
+  `).join('');
+}
+
+function crearEjercicio() {
+  const nombre = document.getElementById('ne-nombre').value.trim();
+  const golpe = document.getElementById('ne-golpe').value;
+  const desc = document.getElementById('ne-desc').value.trim();
+  if (!nombre || !golpe) { alert('Nombre y golpe son requeridos'); return; }
+  db.ejercicios.push({ id: db.nextId.ejercicios++, golpe, nombre, desc, _custom: true });
+  save(); closeModal('modal-nuevo-ejercicio');
+  document.getElementById('ne-nombre').value = '';
+  document.getElementById('ne-desc').value = '';
+  renderBiblioteca();
+}
+
+function eliminarEjercicio(id) {
+  if (!confirm('¿Eliminar este ejercicio?')) return;
+  db.ejercicios = db.ejercicios.filter(e => e.id !== id);
+  save(); renderBiblioteca();
+}
+
+// ══════════════════════════════════════════
+//  PLAN DE EJERCICIOS EN NUEVA CLASE
+// ══════════════════════════════════════════
+function actualizarPlanEjercicios(containerId) {
+  // leer golpes seleccionados
+  const chipsId = containerId === 'nc-plan-ejercicios' ? 'nc-golpes-chips' : 'ec-golpes-chips';
+  const golpesSeleccionados = Array.from(document.querySelectorAll(`#${chipsId} input[type=checkbox]:checked`)).map(cb => cb.value);
+  const planDiv = document.getElementById(containerId);
+  if (!planDiv) return;
+  if (!golpesSeleccionados.length) {
+    planDiv.innerHTML = '<div class="plan-empty">Seleccioná golpes arriba para ver los ejercicios disponibles.</div>';
+    return;
+  }
+  const ejerciciosPorGolpe = golpesSeleccionados.map(g => ({
+    golpe: g,
+    items: db.ejercicios.filter(e => e.golpe === g)
+  })).filter(g => g.items.length > 0);
+  if (!ejerciciosPorGolpe.length) {
+    planDiv.innerHTML = '<div class="plan-empty">No hay ejercicios cargados para los golpes seleccionados.</div>';
+    return;
+  }
+  // mantener selección existente
+  const yaSeleccionados = new Set(
+    Array.from(planDiv.querySelectorAll('.ejercicio-check-row.selected')).map(r => r.dataset.id)
+  );
+  planDiv.innerHTML = ejerciciosPorGolpe.map(({ golpe, items }) => `
+    <div class="plan-golpe-titulo">${golpe}</div>
+    ${items.map(e => `
+      <div class="ejercicio-check-row ${yaSeleccionados.has(String(e.id)) ? 'selected' : ''}" data-id="${e.id}" onclick="togglePlanEjercicio(this)">
+        <div class="ej-check-box">${yaSeleccionados.has(String(e.id)) ? '✓' : ''}</div>
+        <div class="ej-check-info">
+          <div class="ej-check-name">${e.nombre}</div>
+          <div class="ej-check-desc">${e.desc}</div>
+        </div>
+      </div>`).join('')}
+  `).join('');
+}
+
+function togglePlanEjercicio(row) {
+  row.classList.toggle('selected');
+  const box = row.querySelector('.ej-check-box');
+  box.textContent = row.classList.contains('selected') ? '✓' : '';
+}
+
+function getEjerciciosSeleccionados(planDivId) {
+  return Array.from(document.querySelectorAll(`#${planDivId} .ejercicio-check-row.selected`))
+    .map(r => parseInt(r.dataset.id));
+}
+
+// ══════════════════════════════════════════
+//  CLASES
+// ══════════════════════════════════════════
+function limpiarFiltrosClases() {
+  document.getElementById('cf-alumno').value = '';
+  document.getElementById('cf-estado').value = '';
+  document.getElementById('cf-golpe').value = '';
+  document.getElementById('cf-desde').value = '';
+  document.getElementById('cf-hasta').value = '';
+  renderClases();
+}
+
+function poblarFiltroAlumnos() {
+  const sel = document.getElementById('cf-alumno');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">👤 Todos los alumnos</option>' +
+    misAlumnos().map(a => `<option value="${a.id}">${a.nombre} ${a.apellido}</option>`).join('');
+  if (cur) sel.value = cur;
+}
+
+function renderClases(filtroAlumno) {
+  poblarFiltroAlumnos();
+  const list = document.getElementById('clases-list');
+  let clases = [...misClases()].sort((a, b) => b.fecha.localeCompare(a.fecha));
+
+  // legacy support: direct alumnoId filter from other views
+  if (filtroAlumno) clases = clases.filter(c => c.alumnoId === filtroAlumno);
+
+  // UI filters
+  const cfAlumno = document.getElementById('cf-alumno')?.value;
+  const cfEstado = document.getElementById('cf-estado')?.value;
+  const cfGolpe = (document.getElementById('cf-golpe')?.value || '').toLowerCase().trim();
+  const cfDesde = document.getElementById('cf-desde')?.value;
+  const cfHasta = document.getElementById('cf-hasta')?.value;
+
+  if (cfAlumno) clases = clases.filter(c => c.alumnoId === parseInt(cfAlumno));
+  if (cfEstado) clases = clases.filter(c => c.estado === cfEstado);
+  if (cfGolpe) clases = clases.filter(c => (c.golpes || '').toLowerCase().includes(cfGolpe));
+  if (cfDesde) clases = clases.filter(c => c.fecha >= cfDesde);
+  if (cfHasta) clases = clases.filter(c => c.fecha <= cfHasta);
+
+  // show count & clear button
+  const hayFiltros = cfAlumno || cfEstado || cfGolpe || cfDesde || cfHasta;
+  const countEl = document.getElementById('cf-count');
+  const clearEl = document.getElementById('cf-clear');
+  if (countEl) countEl.textContent = hayFiltros ? `${clases.length} resultado${clases.length !== 1 ? 's' : ''}` : '';
+  if (clearEl) clearEl.style.display = hayFiltros ? 'block' : 'none';
+
+  if (!clases.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>' + (hayFiltros ? 'No hay clases que coincidan con los filtros' : 'Sin clases registradas') + '</div>'; return; }
+  list.innerHTML = clases.map(c => {
+    const a = getAlumno(c.alumnoId);
+    const isPending = c.estado === 'pendiente';
+    return `<div class="clase-row" onclick="${isPending ? '' : 'verClase(' + c.id + ')'}" style="cursor:${isPending ? 'default' : 'pointer'}">
+      <div>
+        <div class="clase-title">${a ? a.nombre + ' ' + a.apellido : '—'}${c.hora ? ' &nbsp;·&nbsp; ' + c.hora + ' hs' : ''}${c.notaCoach ? ' <span class="nota-coach-badge" title="Tiene nota privada">📝</span>' : ''}</div>
+        <div class="clase-fecha">${formatFecha(c.fecha)} &nbsp;·&nbsp; ${c.duracion} min${isPending ? '' : ' &nbsp;·&nbsp; ' + (c.golpes || '—')}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="chip ${isPending ? 'chip-pending' : 'chip-done'}">${isPending ? '⏳ Pendiente' : '✓ Realizada'}</span>
+        <div class="clase-actions" onclick="event.stopPropagation()">
+          ${isPending
+            ? `<button class="btn-sm btn-green" style="padding:5px 12px" onclick="completarClase(${c.id})">✅ Dar clase</button>`
+            : `<button class="btn-sm btn-outline" style="padding:5px 10px" onclick="editarClase(${c.id})" title="Editar">✏️</button>`}
+          <button class="btn-sm btn-danger" style="padding:5px 10px" onclick="eliminarClase(${c.id})" title="Eliminar">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  poblaNcAlumno();
+}
+
+let currentClaseEdit = null;
+
+// Abre el modal de "completar clase" para una clase pendiente
+function completarClase(id) {
+  const c = db.clases.find(x => x.id === id);
+  if (!c) return;
+  currentClaseEdit = id;
+  // Poblar el modal de editar clase con los datos pre-cargados
+  const sel = document.getElementById('ec-alumno');
+  sel.innerHTML = misAlumnos().map(a => `<option value="${a.id}">${a.nombre} ${a.apellido}</option>`).join('');
+  sel.value = c.alumnoId;
+  document.getElementById('ec-fecha').value = c.fecha;
+  document.getElementById('ec-correcciones').value = c.correcciones || '';
+  document.getElementById('ec-nota-coach').value = c.notaCoach || '';
+  document.getElementById('ec-duracion').value = c.duracion || 60;
+  document.getElementById('ec-estado').value = 'realizada'; // default: marcar como realizada
+  const seleccionados = (c.golpes || '').split(',').map(g => g.trim()).filter(Boolean);
+  renderGolpesChips('ec-golpes-chips', seleccionados);
+  const planDiv = document.getElementById('ec-plan-ejercicios');
+  if (planDiv) planDiv.innerHTML = '<div class="plan-empty">Seleccioná golpes arriba para ver los ejercicios disponibles.</div>';
+  // Cambiar título del modal
+  document.querySelector('#modal-editar-clase .modal-title').textContent = '✅ Completar Clase';
+  openModal('modal-editar-clase');
+}
+
+function editarClase(id) {
+  document.querySelector('#modal-editar-clase .modal-title').textContent = 'Editar Clase';
+  const c = db.clases.find(x => x.id === id);
+  if (!c) return;
+  currentClaseEdit = id;
+  const sel = document.getElementById('ec-alumno');
+  sel.innerHTML = misAlumnos().map(a => `<option value="${a.id}">${a.nombre} ${a.apellido}</option>`).join('');
+  sel.value = c.alumnoId;
+  document.getElementById('ec-fecha').value = c.fecha;
+  document.getElementById('ec-correcciones').value = c.correcciones || '';
+  document.getElementById('ec-nota-coach').value = c.notaCoach || '';
+  document.getElementById('ec-duracion').value = c.duracion || 60;
+  document.getElementById('ec-estado').value = c.estado || 'realizada';
+  const seleccionados = (c.golpes || '').split(',').map(g => g.trim()).filter(Boolean);
+  renderGolpesChips('ec-golpes-chips', seleccionados);
+  openModal('modal-editar-clase');
+}
+
+function guardarClaseEditada() {
+  const c = db.clases.find(x => x.id === currentClaseEdit);
+  if (!c) return;
+  const alumnoId = parseInt(document.getElementById('ec-alumno').value);
+  const fecha = document.getElementById('ec-fecha').value;
+  if (!alumnoId || !fecha) { alert('Selecciona alumno y fecha'); return; }
+  c.alumnoId = alumnoId;
+  c.fecha = fecha;
+  c.golpes = getGolpesSeleccionados('ec-golpes-chips');
+  c.correcciones = document.getElementById('ec-correcciones').value;
+  c.notaCoach = document.getElementById('ec-nota-coach').value;
+  c.duracion = parseInt(document.getElementById('ec-duracion').value) || 60;
+  c.estado = document.getElementById('ec-estado').value;
+  save(); closeModal('modal-editar-clase'); renderClases();
+}
+
+function eliminarClase(id) {
+  if (!confirm('¿Eliminar esta clase? Esta acción no se puede deshacer.')) return;
+  db.clases = db.clases.filter(c => c.id !== id);
+  save(); renderClases();
+}
+
+function verClase(id) {
+  const c = db.clases.find(x => x.id === id);
+  const a = getAlumno(c.alumnoId);
+  document.getElementById('ver-clase-titulo').textContent = `Clase — ${a ? a.nombre : '—'}`;
+  // plan de ejercicios
+  const ejerciciosIds = c.ejercicios || [];
+  const ejerciciosHtml = ejerciciosIds.length
+    ? ejerciciosIds.map(eid => {
+        const e = db.ejercicios.find(x => x.id === eid);
+        if (!e) return '';
+        return `<div class="plan-ejercicio-item">
+          <div class="plan-ejercicio-nombre">📌 ${e.nombre}</div>
+          <div class="plan-ejercicio-desc">${e.desc}</div>
+        </div>`;
+      }).filter(Boolean).join('')
+    : '<div class="alumno-meta" style="padding:8px 0">Sin ejercicios registrados en esta clase.</div>';
+  document.getElementById('ver-clase-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div><b style="color:var(--muted);font-size:.78rem">FECHA</b><br>${formatFecha(c.fecha)}</div>
+      <div><b style="color:var(--muted);font-size:.78rem">DURACIÓN</b><br>${c.duracion} min</div>
+    </div>
+    <div style="margin-bottom:12px"><b style="color:var(--muted);font-size:.78rem">GOLPES TRABAJADOS</b><br>
+      <div class="tag-list" style="margin-top:6px">${(c.golpes || '').split(',').map(g => g.trim()).filter(Boolean).map(g => `<span class="tag">${g}</span>`).join('') || '—'}</div>
+    </div>
+    <div style="margin-bottom:12px"><b style="color:var(--muted);font-size:.78rem">PLAN DE EJERCICIOS</b><br>
+      <div style="margin-top:8px">${ejerciciosHtml}</div>
+    </div>
+    <div class="correccion-item" style="margin-top:8px"><b style="color:var(--muted);font-size:.78rem;display:block;margin-bottom:6px">CORRECCIONES</b>${c.correcciones || 'Sin correcciones'}</div>
+    ${c.notaCoach ? `<div class="nota-coach-wrap"><div class="nota-coach-label">📝 Nota privada <span class="nota-coach-badge">🔒 Solo coach</span></div><div class="nota-coach-text">${c.notaCoach}</div></div>` : ''}
+  `;
+  openModal('modal-ver-clase');
+}
+
+function crearClase() {
+  const alumnoId = parseInt(document.getElementById('nc-alumno').value);
+  const fecha = document.getElementById('nc-fecha').value;
+  if (!alumnoId || !fecha) { alert('Selecciona alumno y fecha'); return; }
+  db.clases.push({
+    id: db.nextId.clases++, coachId: currentUser.coachId, alumnoId, fecha,
+    golpes: getGolpesSeleccionados('nc-golpes-chips'),
+    ejercicios: getEjerciciosSeleccionados('nc-plan-ejercicios'),
+    correcciones: document.getElementById('nc-correcciones').value,
+    notaCoach: document.getElementById('nc-nota-coach').value,
+    duracion: parseInt(document.getElementById('nc-duracion').value) || 60,
+    estado: document.getElementById('nc-estado').value
+  });
+  save(); closeModal('modal-nueva-clase'); renderClases();
+}
+
+function poblaNcAlumno() {
+  ['nc-alumno', 'ag-alumno'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (sel) sel.innerHTML = misAlumnos().map(a => `<option value="${a.id}">${a.nombre} ${a.apellido}</option>`).join('');
+  });
+  renderGolpesChips('nc-golpes-chips', []);
+  const planDiv = document.getElementById('nc-plan-ejercicios');
+  if (planDiv) planDiv.innerHTML = '<div class="plan-empty">Seleccioná golpes arriba para ver los ejercicios disponibles.</div>';
+  const notaEl = document.getElementById('nc-nota-coach');
+  if (notaEl) notaEl.value = '';
+  const corrEl = document.getElementById('nc-correcciones');
+  if (corrEl) corrEl.value = '';
+}
+
+function renderGolpesChips(containerId, seleccionados) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  wrap.innerHTML = GOLPES_PADEL.map(g => {
+    const checked = seleccionados.includes(g);
+    return `<label class="golpe-chip ${checked ? 'checked' : ''}" onclick="toggleChip(this, '${containerId}')">
+      <input type="checkbox" value="${g}" ${checked ? 'checked' : ''}>
+      <span class="chip-dot"></span>${g}
+    </label>`;
+  }).join('');
+}
+
+function toggleChip(label, containerId) {
+  const cb = label.querySelector('input[type=checkbox]');
+  cb.checked = !cb.checked;
+  label.classList.toggle('checked', cb.checked);
+  // actualizar plan si aplica
+  if (containerId === 'nc-golpes-chips') actualizarPlanEjercicios('nc-plan-ejercicios');
+  if (containerId === 'ec-golpes-chips') actualizarPlanEjercicios('ec-plan-ejercicios');
+}
+
+function getGolpesSeleccionados(containerId) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return '';
+  return Array.from(wrap.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value).join(', ');
+}
+
+// ══════════════════════════════════════════
+//  PROGRESO
+// ══════════════════════════════════════════
+const CHART_COLORS = ['#00e676','#40c4ff','#ff6e40','#ea80fc','#ffab40','#69f0ae','#ff5252','#e040fb','#18ffff','#b2ff59'];
+
+function poblarProgresoSel() {
+  const sel = document.getElementById('progreso-sel-alumno');
+  if (!sel) return;
+  sel.innerHTML = db.alumnos.map(a => `<option value="${a.id}">${a.nombre} ${a.apellido}</option>`).join('');
+}
+
+function renderProgreso() {
+  const sel = document.getElementById('progreso-sel-alumno');
+  if (!sel) return;
+  const alumnoId = parseInt(sel.value);
+  const a = getAlumno(alumnoId);
+  if (!a) return;
+  const body = document.getElementById('progreso-body');
+  const clases = misClases().filter(c => c.alumnoId === alumnoId && c.estado === 'realizada').sort((x, y) => x.fecha.localeCompare(y.fecha));
+  if (clases.length < 1) {
+    body.innerHTML = `<div class="chart-empty">📊 ${a.nombre} aún no tiene clases realizadas para mostrar progreso.</div>`;
+    return;
+  }
+  // Nivel general por fecha (historial de golpes actual + simulación por clases)
+  const golpesActuales = a.golpes || {};
+  const golpesKeys = Object.keys(golpesActuales);
+  if (!golpesKeys.length) {
+    body.innerHTML = `<div class="chart-empty">⭐ Registra el nivel de golpes de ${a.nombre} para ver su progreso.</div>`;
+    return;
+  }
+  // Promedio general del alumno (único punto real: nivel actual)
+  // Construimos gráfica de barras del nivel actual de cada golpe + mini-línea de clases por mes
+  body.innerHTML = `
+    <div style="margin-bottom:24px">
+      <div style="font-weight:600;margin-bottom:4px">Nivel actual de golpes — ${a.nombre} ${a.apellido}</div>
+      <div style="color:var(--muted);font-size:.8rem;margin-bottom:16px">${clases.length} clase${clases.length!==1?'s':''} realizadas</div>
+      <canvas id="chart-golpes" height="220" style="width:100%;max-width:640px"></canvas>
+    </div>
+    <hr>
+    <div style="margin-top:20px">
+      <div style="font-weight:600;margin-bottom:4px">Clases realizadas por mes</div>
+      <div style="color:var(--muted);font-size:.8rem;margin-bottom:16px">Frecuencia de entrenamiento</div>
+      <canvas id="chart-frecuencia" height="160" style="width:100%;max-width:640px"></canvas>
+    </div>
+  `;
+  setTimeout(() => {
+    dibujarBarrasGolpes('chart-golpes', golpesActuales);
+    dibujarFrecuencia('chart-frecuencia', clases);
+  }, 50);
+}
+
+function dibujarBarrasGolpes(canvasId, golpes) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const entries = Object.entries(golpes).filter(([, v]) => v > 0);
+  if (!entries.length) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth || 600;
+  const H = 220;
+  canvas.width = Math.min(W, 640) * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = Math.min(W, 640) + 'px';
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const cw = Math.min(W, 640), ch = H;
+  const padL = 10, padR = 10, padT = 20, padB = 40;
+  const innerW = cw - padL - padR;
+  const innerH = ch - padT - padB;
+  const n = entries.length;
+  const barW = Math.max(18, Math.floor(innerW / n) - 8);
+  const gap = (innerW - barW * n) / (n + 1);
+  // fondo líneas guía
+  ctx.strokeStyle = '#1a271a'; ctx.lineWidth = 1;
+  for (let i = 1; i <= 5; i++) {
+    const y = padT + innerH - (innerH * i / 5);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(cw - padR, y); ctx.stroke();
+    ctx.fillStyle = '#4a6a4a'; ctx.font = '10px DM Sans'; ctx.textAlign = 'right';
+    ctx.fillText(i, padL - 2, y + 4);
+  }
+  entries.forEach(([golpe, val], i) => {
+    const x = padL + gap + i * (barW + gap);
+    const barH = (val / 5) * innerH;
+    const y = padT + innerH - barH;
+    const color = CHART_COLORS[i % CHART_COLORS.length];
+    // sombra barra
+    ctx.fillStyle = color + '22';
+    ctx.fillRect(x, padT, barW, innerH);
+    // barra
+    const grad = ctx.createLinearGradient(x, y, x, padT + innerH);
+    grad.addColorStop(0, color);
+    grad.addColorStop(1, color + '55');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x, y, barW, barH, [4, 4, 0, 0]) : ctx.rect(x, y, barW, barH);
+    ctx.fill();
+    // valor encima
+    ctx.fillStyle = color; ctx.font = 'bold 12px DM Sans'; ctx.textAlign = 'center';
+    ctx.fillText('★'.repeat(val), x + barW / 2, y - 5);
+    // etiqueta abajo
+    ctx.fillStyle = '#6b8f6b'; ctx.font = '9px DM Sans';
+    const label = golpe.length > 8 ? golpe.substring(0, 8) + '…' : golpe;
+    ctx.fillText(label, x + barW / 2, padT + innerH + 14);
+  });
+}
+
+function dibujarFrecuencia(canvasId, clases) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth || 600;
+  const H = 160;
+  canvas.width = Math.min(W, 640) * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = Math.min(W, 640) + 'px';
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const cw = Math.min(W, 640), ch = H;
+  // agrupar por mes
+  const mesesNom = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const map = {};
+  clases.forEach(c => {
+    const [y, m] = c.fecha.split('-');
+    const key = `${y}-${m}`;
+    map[key] = (map[key] || 0) + 1;
+  });
+  const keys = Object.keys(map).sort();
+  if (keys.length < 1) return;
+  const values = keys.map(k => map[k]);
+  const maxV = Math.max(...values, 1);
+  const padL = 30, padR = 10, padT = 10, padB = 30;
+  const innerW = cw - padL - padR;
+  const innerH = ch - padT - padB;
+  // líneas guía
+  ctx.strokeStyle = '#1a271a'; ctx.lineWidth = 1;
+  for (let i = 0; i <= maxV; i++) {
+    const y = padT + innerH - (innerH * i / maxV);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(cw - padR, y); ctx.stroke();
+    if (i > 0) { ctx.fillStyle = '#4a6a4a'; ctx.font = '10px DM Sans'; ctx.textAlign = 'right'; ctx.fillText(i, padL - 4, y + 4); }
+  }
+  // área rellena
+  const pts = keys.map((k, i) => ({ x: padL + (i / Math.max(keys.length - 1, 1)) * innerW, y: padT + innerH - (map[k] / maxV) * innerH }));
+  if (pts.length === 1) pts.push({ x: pts[0].x + 40, y: pts[0].y });
+  const grad = ctx.createLinearGradient(0, padT, 0, padT + innerH);
+  grad.addColorStop(0, '#00e67644'); grad.addColorStop(1, '#00e67600');
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, padT + innerH);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length-1].x, padT + innerH);
+  ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+  // línea
+  ctx.beginPath(); ctx.strokeStyle = '#00e676'; ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+  pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.stroke();
+  // puntos
+  pts.forEach((p, i) => {
+    ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#00e676'; ctx.fill();
+    ctx.fillStyle = '#e8f5e8'; ctx.font = 'bold 11px DM Sans'; ctx.textAlign = 'center';
+    ctx.fillText(values[i], p.x, p.y - 10);
+  });
+  // etiquetas eje X
+  keys.forEach((k, i) => {
+    const [y, m] = k.split('-');
+    const label = mesesNom[parseInt(m) - 1] + ' ' + y.slice(2);
+    ctx.fillStyle = '#6b8f6b'; ctx.font = '9px DM Sans'; ctx.textAlign = 'center';
+    ctx.fillText(label, pts[i].x, padT + innerH + 18);
+  });
+}
+
+// Progreso desde vista ALUMNO
+function renderAlumnoProgreso() {
+  const a = getAlumno(currentUser.alumnoId);
+  const clases = db.clases.filter(c => c.alumnoId === a.id && c.estado === 'realizada').sort((x, y) => x.fecha.localeCompare(y.fecha));
+  const body = document.getElementById('alumno-progreso-body'); // alumno sees own classes regardless of coach scoping
+  if (!a.golpes || !Object.keys(a.golpes).length) {
+    body.innerHTML = `<div class="chart-empty">⭐ Tu entrenador aún no ha registrado tu nivel de golpes.</div>`; return;
+  }
+  if (!clases.length) {
+    body.innerHTML = `<div class="chart-empty">📊 Aún no tienes clases realizadas.</div>`; return;
+  }
+  body.innerHTML = `
+    <div style="font-weight:600;margin-bottom:4px">Mi nivel de golpes</div>
+    <div style="color:var(--muted);font-size:.8rem;margin-bottom:16px">${clases.length} clase${clases.length!==1?'s':''} realizadas</div>
+    <canvas id="chart-alumno-golpes" height="220" style="width:100%;max-width:640px"></canvas>
+    <hr style="margin:20px 0">
+    <div style="font-weight:600;margin-bottom:4px">Mis clases por mes</div>
+    <div style="color:var(--muted);font-size:.8rem;margin-bottom:16px">Frecuencia de entrenamiento</div>
+    <canvas id="chart-alumno-freq" height="160" style="width:100%;max-width:640px"></canvas>
+  `;
+  setTimeout(() => {
+    dibujarBarrasGolpes('chart-alumno-golpes', a.golpes);
+    dibujarFrecuencia('chart-alumno-freq', clases);
+  }, 50);
+}
+
+// ══════════════════════════════════════════
+//  CALENDARIO
+// ══════════════════════════════════════════
+function renderCal(suffix, suffix2) {
+  const s = suffix || '';
+  const titulo = document.getElementById('cal-titulo' + s);
+  if (!titulo) return;
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  titulo.textContent = `${meses[calDate.getMonth()]} ${calDate.getFullYear()}`;
+  const hdr = document.getElementById('cal-header' + s);
+  const body = document.getElementById('cal-body' + s);
+  hdr.innerHTML = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d => `<div class="cal-header">${d}</div>`).join('');
+  const year = calDate.getFullYear(), month = calDate.getMonth();
+  const first = new Date(year, month, 1);
+  let startDay = first.getDay(); if (startDay === 0) startDay = 7;
+  const days = new Date(year, month + 1, 0).getDate();
+  const todayStr = new Date().toISOString().split('T')[0];
+  let html = '';
+  for (let i = 1; i < startDay; i++) html += '<div class="cal-day empty"></div>';
+  for (let d = 1; d <= days; d++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    let evts = misEventos().filter(e => e.fecha === dateStr);
+    if (currentUser.role === 'alumno') evts = evts.filter(e => e.alumnoId === currentUser.alumnoId);
+    const hasClass = evts.length > 0;
+    const isToday = dateStr === todayStr;
+    html += `<div class="cal-day ${hasClass ? 'has-class' : ''} ${isToday ? 'today' : ''}" onclick="mostrarDia('${dateStr}','${s}')">${d}${hasClass ? '<div class="cal-dot"></div>' : ''}</div>`;
+  }
+  body.innerHTML = html;
+  poblaNcAlumno();
+}
+
+function calPrev() { calDate.setMonth(calDate.getMonth() - 1); renderCal('', ''); renderCal('2', '2'); }
+function calNext() { calDate.setMonth(calDate.getMonth() + 1); renderCal('', ''); renderCal('2', '2'); }
+
+function mostrarDia(fecha, s) {
+  let evts = misEventos().filter(e => e.fecha === fecha);
+  if (currentUser.role === 'alumno') evts = evts.filter(e => e.alumnoId === currentUser.alumnoId);
+  const id = 'eventos-dia' + (s || '');
+  const div = document.getElementById(id);
+  if (!div) return;
+  if (!evts.length) { div.style.display = 'none'; return; }
+  div.style.display = 'block';
+  div.innerHTML = `<div style="font-weight:600;margin-bottom:12px">📅 ${formatFecha(fecha)}</div>` +
+    evts.map(e => {
+      const a = getAlumno(e.alumnoId);
+      return `<div class="clase-row" style="cursor:default">
+        <div><div class="clase-title">${currentUser.role === 'coach' ? (a ? a.nombre + ' ' + a.apellido : '—') : 'Mi clase'}</div>
+        <div class="clase-fecha">${e.hora} hs &nbsp;·&nbsp; ${e.duracion} min${e.notas ? ' · ' + e.notas : ''}</div></div>
+        ${currentUser.role === 'coach' ? `<button class="btn-sm btn-danger" onclick="eliminarEvento(${e.id})">✕</button>` : ''}
+      </div>`;
+    }).join('');
+}
+
+function eliminarEvento(id) {
+  if (!confirm('¿Eliminar esta clase agendada?')) return;
+  db.eventos = db.eventos.filter(e => e.id !== id);
+  save(); renderCal('', ''); renderCal('2', '2');
+  document.getElementById('eventos-dia').style.display = 'none';
+}
+
+function crearEvento() {
+  const alumnoId = parseInt(document.getElementById('ag-alumno').value);
+  const fecha = document.getElementById('ag-fecha').value;
+  if (!fecha) { alert('Selecciona una fecha'); return; }
+  const hora = document.getElementById('ag-hora').value;
+  const duracion = parseInt(document.getElementById('ag-duracion').value) || 60;
+  const notas = document.getElementById('ag-notas').value;
+  // Crear evento en el calendario
+  const evId = db.nextId.eventos++;
+  db.eventos.push({ id: evId, coachId: currentUser.coachId, alumnoId, fecha, hora, duracion, notas });
+  // Crear clase pendiente vinculada
+  db.clases.push({
+    id: db.nextId.clases++,
+    coachId: currentUser.coachId,
+    alumnoId, fecha, hora, duracion,
+    golpes: '', ejercicios: [],
+    correcciones: notas || '',
+    estado: 'pendiente',
+    eventoId: evId
+  });
+  save(); closeModal('modal-agendar'); renderCal('', ''); renderCal('2', '2'); renderClases();
+}
+
+// ══════════════════════════════════════════
+//  VISTA ALUMNO
+// ══════════════════════════════════════════
+function renderMiPerfil() {
+  const a = getAlumno(currentUser.alumnoId);
+  document.getElementById('alumno-perfil-title').textContent = `Mi Perfil — ${a.nombre} ${a.apellido}`;
+  // Golpes
+  const golpesHtml = Object.entries(a.golpes || {}).map(([g, v]) =>
+    `<div class="golpe-item"><span class="golpe-name">${g}</span><span class="golpe-stars">${'★'.repeat(v)}${'☆'.repeat(5 - v)}</span></div>`
+  ).join('') || '<div class="alumno-meta">Tu entrenador aún no ha registrado tu nivel.</div>';
+  document.getElementById('alumno-golpes-list').innerHTML = golpesHtml;
+  // Correcciones
+  const misClasesAlumno = db.clases.filter(c => c.alumnoId === a.id && c.estado === 'realizada');
+  const corrs = misClasesAlumno.flatMap(c => c.correcciones ? [{ text: c.correcciones, fecha: c.fecha }] : []).reverse().slice(0, 5);
+  document.getElementById('alumno-correcciones-list').innerHTML = corrs.length
+    ? corrs.map(c => `<div class="correccion-item"><div class="correccion-text">${c.text}</div><div class="correccion-meta">${formatFecha(c.fecha)}</div></div>`).join('')
+    : '<div class="alumno-meta">Sin correcciones registradas.</div>';
+  // Clases
+  const list = document.getElementById('alumno-clases-list');
+  list.innerHTML = misClasesAlumno.sort((a, b) => b.fecha.localeCompare(a.fecha)).map(c =>
+    `<div class="clase-row" onclick="verClase(${c.id})">
+      <div><div class="clase-title">${formatFecha(c.fecha)}</div>
+      <div class="clase-fecha">${c.duracion} min &nbsp;·&nbsp; ${c.golpes || '—'}</div></div>
+      <span class="chip chip-done">✓ Ver clase</span>
+    </div>`
+  ).join('') || '<div class="empty-state"><div class="empty-icon">📋</div>Aún no hay clases registradas</div>';
+}
+
+// ══════════════════════════════════════════
+//  UTILIDADES
+// ══════════════════════════════════════════
+function formatFecha(str) {
+  if (!str) return '—';
+  const [y, m, d] = str.split('-');
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return `${parseInt(d)} ${meses[parseInt(m)-1]} ${y}`;
+}
+// ── INFORME DEL ALUMNO ──
+function generarInforme(alumnoId) {
+  const a = getAlumno(alumnoId);
+  const clases = misClases()
+    .filter(c => c.alumnoId === alumnoId && c.estado === 'realizada')
+    .sort((x, y) => y.fecha.localeCompare(x.fecha));
+  const totalMin = clases.reduce((s, c) => s + (c.duracion || 0), 0);
+  const fechaHoy = new Date().toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const badgeClass = { principiante: 'badge-principiante', intermedio: 'badge-intermedio', avanzado: 'badge-avanzado' }[a.nivel.toLowerCase()] || 'badge-principiante';
+
+  const clasesHtml = clases.length ? clases.map(c => {
+    const golpesHtml = (c.golpes || '').split(',').map(g => g.trim()).filter(Boolean).map(g => `<span class="informe-tag">${g}</span>`).join(' ') || '<span style="color:#aaa;font-size:.75rem">Sin golpes registrados</span>';
+    const eids = c.ejercicios || [];
+    const ejHtml = eids.length
+      ? `<div style="margin-top:7px">${eids.map(eid => {
+          const e = db.ejercicios.find(x => x.id === eid);
+          if (!e) return '';
+          return `<div class="informe-ejercicio-item"><div class="informe-ej-dot"></div><div><div class="informe-ej-nombre">${e.nombre}</div><div class="informe-ej-desc">${e.desc}</div></div></div>`;
+        }).filter(Boolean).join('')}</div>`
+      : `<div class="informe-sin-ej">Sin ejercicios registrados en esta clase.</div>`;
+    const corrHtml = c.correcciones ? `<div class="informe-correccion">💬 ${c.correcciones}</div>` : '';
+    return `<div class="informe-clase-item">
+      <div class="informe-clase-header">
+        <div>
+          <div class="informe-clase-fecha">${formatFecha(c.fecha)}</div>
+          <div class="informe-clase-meta">${c.duracion} min</div>
+        </div>
+        <div style="text-align:right">${golpesHtml}</div>
+      </div>
+      <div class="informe-clase-body">
+        <div style="font-size:.7rem;font-weight:700;color:#00b248;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Ejercicios trabajados</div>
+        ${ejHtml}${corrHtml}
+      </div>
+    </div>`;
+  }).join('') : '<div style="text-align:center;padding:16px;color:#aaa;font-size:.83rem">No hay clases realizadas para mostrar.</div>';
+
+  document.getElementById('informe-contenido').innerHTML = `
+    <div class="informe-wrap" id="informe-print">
+      <div class="informe-header">
+        <div>
+          <div class="informe-logo">🎾 PádelPro</div>
+          <div class="informe-titulo">Informe del Alumno</div>
+        </div>
+        <div class="informe-fecha-emision">Generado el ${fechaHoy}</div>
+      </div>
+      <div class="informe-alumno-header">
+        <div class="informe-avatar">${a.nombre[0].toUpperCase()}</div>
+        <div>
+          <div class="informe-alumno-nombre">${a.nombre} ${a.apellido}</div>
+          <div class="informe-alumno-meta">@${a.user}${a.tel ? ' · ' + a.tel : ''}</div>
+          <span class="informe-level-badge ${badgeClass}">${a.nivel}</span>
+          ${a.notas ? `<div style="font-size:.78rem;color:#666;margin-top:4px;font-style:italic">"${a.notas}"</div>` : ''}
+        </div>
+      </div>
+      <div class="informe-stats">
+        <div class="informe-stat"><div class="informe-stat-num">${clases.length}</div><div class="informe-stat-label">Clases realizadas</div></div>
+        <div class="informe-stat"><div class="informe-stat-num">${totalMin}</div><div class="informe-stat-label">Minutos entrenados</div></div>
+        <div class="informe-stat"><div class="informe-stat-num">${Math.round(totalMin / 60 * 10) / 10}</div><div class="informe-stat-label">Horas en cancha</div></div>
+      </div>
+      <div class="informe-seccion-titulo">Historial de clases · Ejercicios · Correcciones</div>
+      ${clasesHtml}
+      <div class="informe-footer">
+        <div class="informe-footer-logo">🎾 PádelPro</div>
+        <div class="informe-footer-meta">Informe generado automáticamente · ${fechaHoy}</div>
+      </div>
+    </div>`;
+  openModal('modal-informe');
+}
+
+function imprimirInforme() {
+  const contenido = document.getElementById('informe-print').innerHTML;
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe PádelPro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}body{font-family:'DM Sans',sans-serif;background:#fff;color:#1a1a1a;padding:28px;}
+    .informe-wrap{max-width:700px;margin:0 auto;}
+    .informe-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;padding-bottom:18px;border-bottom:2px solid #00b248;}
+    .informe-logo{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;color:#00b248;letter-spacing:2px;}
+    .informe-titulo{font-size:.9rem;color:#444;margin-top:2px;}
+    .informe-fecha-emision{font-size:.75rem;color:#888;text-align:right;}
+    .informe-alumno-header{display:flex;align-items:center;gap:14px;background:#f4fdf4;border-radius:10px;padding:14px 18px;margin-bottom:20px;}
+    .informe-avatar{width:48px;height:48px;border-radius:50%;background:#00b248;color:#fff;font-weight:700;font-size:1.2rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .informe-alumno-nombre{font-size:1.1rem;font-weight:600;}.informe-alumno-meta{font-size:.8rem;color:#666;margin-top:2px;}
+    .informe-level-badge{display:inline-block;padding:3px 11px;border-radius:20px;font-size:.72rem;font-weight:600;margin-top:5px;}
+    .badge-principiante{background:#e8f5e9;color:#2e7d32;}.badge-intermedio{background:#fff8e1;color:#f57f17;}.badge-avanzado{background:#fce4ec;color:#c62828;}
+    .informe-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+    .informe-stat{background:#f4fdf4;border-radius:8px;padding:12px;text-align:center;}
+    .informe-stat-num{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;color:#00b248;}
+    .informe-stat-label{font-size:.7rem;color:#666;text-transform:uppercase;letter-spacing:.5px;}
+    .informe-seccion-titulo{font-size:.7rem;font-weight:700;color:#00b248;text-transform:uppercase;letter-spacing:.7px;margin:18px 0 9px;display:flex;align-items:center;gap:7px;}
+    .informe-seccion-titulo::after{content:'';flex:1;height:1px;background:#d4edda;}
+    .informe-clase-item{border:1px solid #e0e0e0;border-radius:8px;margin-bottom:9px;overflow:hidden;page-break-inside:avoid;}
+    .informe-clase-header{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:#f9f9f9;border-bottom:1px solid #f0f0f0;}
+    .informe-clase-fecha{font-weight:600;font-size:.88rem;}.informe-clase-meta{font-size:.75rem;color:#888;}
+    .informe-clase-body{padding:9px 13px;}
+    .informe-tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.7rem;background:#e8f5e9;color:#2e7d32;margin:2px;}
+    .informe-correccion{background:#fffbf0;border-left:3px solid #f9a825;border-radius:0 6px 6px 0;padding:7px 11px;margin-top:7px;font-size:.81rem;color:#444;line-height:1.5;}
+    .informe-ejercicio-item{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid #f5f5f5;}
+    .informe-ejercicio-item:last-child{border-bottom:none;}
+    .informe-ej-dot{width:5px;height:5px;border-radius:50%;background:#00b248;flex-shrink:0;margin-top:6px;}
+    .informe-ej-nombre{font-size:.81rem;font-weight:600;color:#1a1a1a;}
+    .informe-ej-desc{font-size:.72rem;color:#666;line-height:1.4;margin-top:1px;}
+    .informe-footer{margin-top:24px;padding-top:14px;border-top:1px solid #e0e0e0;display:flex;justify-content:space-between;align-items:center;}
+    .informe-footer-logo{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#00b248;letter-spacing:1px;}
+    .informe-footer-meta{font-size:.7rem;color:#aaa;}
+    .informe-sin-ej{font-size:.76rem;color:#aaa;font-style:italic;padding:3px 0;}
+  </style></head><body><div class="informe-wrap">${contenido}</div></body></html>`);
+  w.document.close();
+  setTimeout(() => w.print(), 400);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
+
+// set today on date inputs
+document.querySelectorAll('input[type=date]').forEach(i => { if (!i.value) i.value = hoy(); });
+</script>
+
+
+
+<!-- MODAL INFORME -->
+<div class="modal-overlay" id="modal-informe">
+  <div class="modal">
+    <div class="informe-print-btns">
+      <button class="btn-sm btn-green" onclick="imprimirInforme()">🖨️ Imprimir / Guardar PDF</button>
+      <button class="btn-sm btn-outline" onclick="closeModal('modal-informe')">Cerrar</button>
+    </div>
+    <div id="informe-contenido"></div>
+  </div>
+</div>
+
+</body></html>
